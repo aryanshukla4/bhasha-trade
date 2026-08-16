@@ -17,7 +17,7 @@ def issue_token(user_id: str, role: str) -> str:
     return f"{encoded.decode()}.{base64.urlsafe_b64encode(signature).rstrip(b'=').decode()}"
 
 def decode_token(authorization: str | None = Header(default=None)) -> dict:
-    if not authorization or not authorization.startswith("Bearer "):
+    if not authorization or not authorization.strip().lower().startswith("bearer "):
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Authentication required")
     try:
         encoded, signature = authorization[7:].split(".")

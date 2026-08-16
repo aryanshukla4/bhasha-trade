@@ -1,13 +1,21 @@
 from datetime import datetime, timezone
 from uuid import uuid4
 from fastapi import HTTPException
-from sqlalchemy import select
+from sqlalchemy import inspect, select
 from sqlalchemy.orm import Session
 from app.models import BarterMatch, BarterRequest, ChatLog, Dealer, MarketPrice, Notification, Order, ProduceListing, PushSubscription, Review, User
 
 def ident(prefix): return f'{prefix}_{uuid4().hex}'
+
 def dto(row):
-    return {key:value for key,value in row.__dict__.items() if not key.startswith('_')}
+    if row is None:
+        return None
+    try:
+        mapper = inspect(type(row))
+        return {attr.key: getattr(row, attr.key) for attr in mapper.column_attrs}
+    except Exception:
+        return {key: value for key, value in row.__dict__.items() if not key.startswith('_')}
+
 def own(user, owner_id):
     if user.id != owner_id and user.role != 'admin': raise HTTPException(403,'Not permitted')
 
@@ -40,19 +48,40 @@ class DomainService:
         if item.farmer_id==user.id:raise HTTPException(422,'Cannot express interest in your own listing')
         order=Order(id=ident('order'),listing_id=item.id,buyer_id=user.id,farmer_id=item.farmer_id,agreed_price=float(b.get('offeredPrice',item.price_per_unit)),status='pending');s.add(order);s.add(Notification(id=ident('notification'),user_id=item.farmer_id,type='order',title='New buyer interest',body='A buyer is interested in your listing.'));s.commit();return dto(order)
     def order_action(self,s,user,order_id,action):
+        if action not in ('accept','complete','reject','cancel'):
+            raise HTTPException(422,'Invalid order action')
         order=s.get(Order,order_id)
         if not order:raise HTTPException(404,'Order not found')
-        if action=='accept':own(user,order.farmer_id); valid='pending'; target='accepted'
-        else:
+        if action=='accept':
+            own(user,order.farmer_id)
+            if order.status!='pending':raise HTTPException(409,'Only pending orders can be accepted')
+            order.status='accepted'
+            item=s.get(ProduceListing,order.listing_id)
+            if item:item.status='reserved'
+        elif action=='complete':
             if user.id not in (order.buyer_id,order.farmer_id) and user.role!='admin':raise HTTPException(403,'Not permitted')
-            valid='accepted';target='completed'
-        if order.status!=valid:raise HTTPException(409,f'Only {valid} orders can be {target}')
-        order.status=target
-        if target=='accepted':self.listing(s,order.listing_id).status='reserved'
-        if target=='completed':self.listing(s,order.listing_id).status='sold'
+            if order.status!='accepted':raise HTTPException(409,'Only accepted orders can be completed')
+            order.status='completed'
+            item=s.get(ProduceListing,order.listing_id)
+            if item:item.status='sold'
+        elif action in ('reject','cancel'):
+            if user.id not in (order.buyer_id,order.farmer_id) and user.role!='admin':raise HTTPException(403,'Not permitted')
+            order.status='cancelled'
+            item=s.get(ProduceListing,order.listing_id)
+            if item and item.status=='reserved':item.status='active'
         s.commit();return dto(order)
     def parse_barter(self,text):
-        text=text.lower();return {'intent':'barter_request','itemWanted':'fertilizer' if 'fertilizer' in text else None,'itemOffered':'wheat' if 'wheat' in text else None,'needsClarification':not('fertilizer' in text and 'wheat' in text)}
+        t=text.lower()
+        wanted=None
+        if any(w in t for w in ('fertilizer','fertiliser','khad','खाद')):wanted='fertilizer'
+        elif any(w in t for w in ('seed','seeds','beej','बीज')):wanted='seeds'
+        elif any(w in t for w in ('pesticide','keetnashak','कीटनाशक')):wanted='pesticide'
+
+        offered=None
+        if any(w in t for w in ('wheat','gehu','gehun','गेहूं','गेहू')):offered='wheat'
+        elif any(w in t for w in ('rice','paddy','chawal','dhan','चावल','धान')):offered='rice'
+
+        return {'intent':'barter_request','itemWanted':wanted,'itemOffered':offered,'needsClarification':not(wanted and offered)}
     def barter_request_for(self,s,request_id):
         req=s.get(BarterRequest,request_id)
         if not req:raise HTTPException(404,'Barter request not found')
@@ -67,9 +96,11 @@ class DomainService:
     def barter_matches(self,s,user,request_id):
         req=self.barter_request_for(s,request_id);own(user,req.farmer_id)
         existing={m.dealer_id:m for m in s.scalars(select(BarterMatch).where(BarterMatch.request_id==request_id))}
+        wanted=(req.item_wanted or "").lower()
         for d in s.scalars(select(Dealer)):
             if d.id in existing:continue
-            if req.item_wanted.lower() in {k.lower() for k in (d.items_available or {})}:
+            available_items=[k.lower() for k in (d.items_available or {})]
+            if wanted and any(wanted in item or item in wanted for item in available_items):
                 match=BarterMatch(id=ident('match'),request_id=request_id,dealer_id=d.id,match_score=1.0,status='suggested')
                 s.add(match);existing[d.id]=match
         s.commit()
@@ -111,5 +142,7 @@ class DomainService:
     def ask(self,s,user,b):
         q=b.get('text') or b.get('transcript')
         if not q:raise HTTPException(422,'text or transcript is required')
-        lang=b.get('language',user.preferred_language);answer='Mitti, fasal ki avastha aur sthaniya mausam ko dhyan mein rakhkar faisla lein.' if lang=='hi' else 'Consider your soil, crop stage, and local weather before acting.'
+        lang=b.get('language') or user.preferred_language or 'hi'
+        answer='Mitti, fasal ki avastha aur sthaniya mausam ko dhyan mein rakhkar faisla lein.' if lang=='hi' else 'Consider your soil, crop stage, and local weather before acting.'
         log=ChatLog(id=ident('chat'),user_id=user.id,query=q,response=answer,language=lang);s.add(log);s.commit();return {**dto(log),'sources':['ICAR / Krishi Vigyan Kendra guidance']}
+

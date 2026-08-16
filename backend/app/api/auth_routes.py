@@ -19,7 +19,9 @@ service = AuthService()
 
 
 def valid_phone(value):
-    value = value.replace(' ', '').replace('-', '')
+    if not value or not isinstance(value, str):
+        raise HTTPException(422, 'Provide a valid phone number with country code')
+    value = value.replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
     if not value.lstrip('+').isdigit() or not 10 <= len(value.lstrip('+')) <= 15:
         raise HTTPException(422, 'Provide a valid phone number with country code')
     return value

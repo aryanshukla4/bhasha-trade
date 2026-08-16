@@ -1,21 +1,38 @@
 # FastAPI Backend
 
-This is the only supported backend. It uses FastAPI, PostgreSQL, and Redis (rate limiting). Copy `.env.example` to `.env`, create the `bhasha_trade` PostgreSQL database, and set `DATABASE_URL` before starting the API.
+FastAPI, PostgreSQL / SQLite backend for Bhasha Trade.
 
-For local Postgres + Redis, run `docker compose up -d postgres redis` from the repository root, then set `DATABASE_URL=postgresql+psycopg://bhasha_trade:bhasha_trade_dev@localhost:5432/bhasha_trade` and `REDIS_URL=redis://localhost:6379/0`.
+## Quickstart
 
-OTP endpoints (`/api/auth/send-otp`, `/api/auth/verify-otp`) are rate limited per IP via Redis. CORS is locked to the origins in `CORS_ORIGINS` (comma-separated).
-
-Start the service from this directory:
-
+### 1. Install Dependencies
 ```powershell
-python -m uvicorn app.main:app --reload --port 8010
+cd backend
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
 ```
 
-Run API tests without starting a server:
-
+### 2. Start Live Server
 ```powershell
-python -m unittest discover -s tests -v
+python -m uvicorn app.main:app --reload --port 8000
 ```
+- **Health Check**: `http://localhost:8000/health`
+- **Swagger Docs**: `http://localhost:8000/docs`
+- **ReDoc Docs**: `http://localhost:8000/redoc`
 
-Tests use FastAPI's `TestClient` and validate the API in-process.
+### 3. Run Test Suite
+```powershell
+pytest tests -v
+```
+Runs the 23-test API verification suite in-memory with zero external server dependencies.
+
+### 4. Optional Local Postgres + Redis Setup
+For local production testing with PostgreSQL and Redis:
+```powershell
+docker compose up -d postgres redis
+```
+Then set in your `.env` file:
+```env
+DATABASE_URL=postgresql+psycopg://bhasha_trade:bhasha_trade_dev@localhost:5432/bhasha_trade
+REDIS_URL=redis://localhost:6379/0
+```

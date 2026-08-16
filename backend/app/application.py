@@ -1,3 +1,6 @@
+from contextlib import asynccontextmanager
+from urllib.parse import urlparse
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
@@ -18,19 +21,35 @@ SECURITY_HEADERS = {
 }
 
 
-def create_app() -> FastAPI:
-    app = FastAPI(title='Bhasha Trade API', version='1.0.0')
+def _clean_allowed_hosts(origins: list[str]) -> list[str]:
+    hosts = set()
+    for origin in origins:
+        if "://" in origin:
+            parsed = urlparse(origin)
+            host = parsed.hostname
+        else:
+            host = origin.split(":")[0]
+        if host:
+            hosts.add(host)
+    return list(hosts) or ["*"]
 
-    @app.on_event('startup')
-    def startup():
-        initialize_database()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    initialize_database()
+    yield
+
+
+def create_app() -> FastAPI:
+    app = FastAPI(title='Bhasha Trade API', version='1.0.0', lifespan=lifespan)
 
     app.state.limiter = limiter
     app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
     app.add_middleware(SlowAPIMiddleware)
 
     if settings.app_env == 'production':
-        app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.cors_origin_list)
+        allowed_hosts = _clean_allowed_hosts(settings.cors_origin_list)
+        app.add_middleware(TrustedHostMiddleware, allowed_hosts=allowed_hosts)
 
     app.add_middleware(
         CORSMiddleware,
@@ -49,3 +68,4 @@ def create_app() -> FastAPI:
     app.include_router(auth_router)
     app.include_router(domain_router)
     return app
+

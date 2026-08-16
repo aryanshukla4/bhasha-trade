@@ -106,6 +106,8 @@ def delete_produce(item_id: str, u=Depends(user), s: Session = Depends(get_sessi
     item = service.listing(s, item_id)
     own(u, item.farmer_id)
     item.status = 'cancelled'
+    for order in s.scalars(select(Order).where(Order.listing_id == item_id, Order.status.in_(['pending', 'accepted']))):
+        order.status = 'cancelled'
     s.commit()
 
 
@@ -137,6 +139,16 @@ def accept(item_id: str, u=Depends(user), s: Session = Depends(get_session)):
 @router.post('/api/orders/{item_id}/complete')
 def complete(item_id: str, u=Depends(user), s: Session = Depends(get_session)):
     return data(service.order_action(s, u, item_id, 'complete'))
+
+
+@router.post('/api/orders/{item_id}/reject')
+def reject(item_id: str, u=Depends(user), s: Session = Depends(get_session)):
+    return data(service.order_action(s, u, item_id, 'reject'))
+
+
+@router.post('/api/orders/{item_id}/cancel')
+def cancel(item_id: str, u=Depends(user), s: Session = Depends(get_session)):
+    return data(service.order_action(s, u, item_id, 'cancel'))
 
 
 @router.post('/api/barter/parse-request')
