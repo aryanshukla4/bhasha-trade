@@ -107,9 +107,5 @@ class TextToVoiceRequest(BaseModel):
     language: str | None = None
 
 
-class CropDetectRequest(BaseModel):
-    photoUrl: str
-
-
 class NotificationSubscribeRequest(BaseModel):
     endpoint: str

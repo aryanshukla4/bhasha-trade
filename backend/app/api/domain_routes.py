@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -11,7 +11,6 @@ from app.schemas import (
     BarterParseRequest,
     BarterRequestCreate,
     ChatAskRequest,
-    CropDetectRequest,
     InterestRequest,
     LanguageUpdateRequest,
     NotificationSubscribeRequest,
@@ -21,6 +20,7 @@ from app.schemas import (
     TextToVoiceRequest,
     VoiceToTextRequest,
 )
+from app.services import crop_detection
 from app.services.domain_service import DomainService, dto, ident, own
 
 router = APIRouter(tags=['business'])
@@ -221,9 +221,12 @@ def tts(body: TextToVoiceRequest, u=Depends(user)):
     return data({'text': body.text, 'language': body.language or u.preferred_language, 'audioUrl': None})
 
 
-@router.post('/api/crop/detect-disease', status_code=202)
-def crop(body: CropDetectRequest, u=Depends(user)):
-    return data({'photoUrl': body.photoUrl, 'diagnosis': 'Analysis provider not configured', 'confidence': None})
+@router.post('/api/crop/detect-disease')
+async def crop(photo: UploadFile = File(...), u=Depends(user)):
+    image_bytes = await photo.read()
+    if not image_bytes:
+        raise HTTPException(422, 'Uploaded file is empty')
+    return data(crop_detection.detect_disease(image_bytes))
 
 
 @router.get('/api/crop/advisory/{crop_type}')

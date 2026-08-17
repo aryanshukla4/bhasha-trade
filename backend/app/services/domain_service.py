@@ -4,6 +4,7 @@ from fastapi import HTTPException
 from sqlalchemy import inspect, select
 from sqlalchemy.orm import Session
 from app.models import BarterMatch, BarterRequest, ChatLog, Dealer, MarketPrice, Notification, Order, ProduceListing, PushSubscription, Review, User
+from app.services import chat_ai
 
 def ident(prefix): return f'{prefix}_{uuid4().hex}'
 
@@ -143,6 +144,6 @@ class DomainService:
         q=b.get('text') or b.get('transcript')
         if not q:raise HTTPException(422,'text or transcript is required')
         lang=b.get('language') or user.preferred_language or 'hi'
-        answer='Mitti, fasal ki avastha aur sthaniya mausam ko dhyan mein rakhkar faisla lein.' if lang=='hi' else 'Consider your soil, crop stage, and local weather before acting.'
-        log=ChatLog(id=ident('chat'),user_id=user.id,query=q,response=answer,language=lang);s.add(log);s.commit();return {**dto(log),'sources':['ICAR / Krishi Vigyan Kendra guidance']}
+        answer,sources=chat_ai.ask_groq(s,q,lang)
+        log=ChatLog(id=ident('chat'),user_id=user.id,query=q,response=answer,language=lang);s.add(log);s.commit();return {**dto(log),'sources':sources}
 

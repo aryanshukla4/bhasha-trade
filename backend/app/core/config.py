@@ -12,6 +12,14 @@ class Settings(BaseSettings):
     redis_url: str = "memory://"
     cors_origins: str = "http://localhost:3000,http://localhost:5173,http://localhost:8000"
 
+    groq_api_key: str | None = None
+    groq_model: str = "llama-3.1-8b-instant"
+    agmarknet_api_key: str | None = None
+    openweather_api_key: str | None = None
+    kindwise_api_key: str | None = None
+    crop_model_root: str = "./crop_model"
+    crop_confidence_threshold: float = 0.55
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]

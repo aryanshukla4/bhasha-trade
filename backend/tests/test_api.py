@@ -313,9 +313,10 @@ class BhashaTradeApiTests(unittest.TestCase):
         farmer = self.login("+919000000050", "farmer", "Farmer Kalu")
         headers = {"Authorization": f"Bearer {farmer['accessToken']}"}
 
-        response = self.client.post("/api/crop/detect-disease", headers=headers, json={"photoUrl": "https://storage.example/leaf.jpg"})
-        self.assertEqual(response.status_code, 202)
-        self.assertEqual(response.json()["data"]["photoUrl"], "https://storage.example/leaf.jpg")
+        # No trained model/opencv configured in the test environment -> the endpoint
+        # must degrade gracefully (503) instead of crashing the request.
+        response = self.client.post("/api/crop/detect-disease", headers=headers, files={"photo": ("leaf.jpg", b"not-a-real-image", "image/jpeg")})
+        self.assertEqual(response.status_code, 503)
 
         response = self.client.get("/api/crop/advisory/wheat", headers=headers)
         self.assertEqual(response.status_code, 200)
