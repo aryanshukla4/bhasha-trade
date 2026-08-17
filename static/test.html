@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Kisan Mitra — Farmer Chatbot</title>
+<style>
+  :root {
+    --minecraft-green: #2ecc71;
+    --minecraft-dark-green: #27ae60;
+    --minecraft-brown: #8b4513;
+    --minecraft-light-brown: #a0522d;
+    --minecraft-dirt: #6b4226;
+    --minecraft-grass-top: #7fd85f;
+    --minecraft-grass-side: #a9d18e;
+    --minecraft-stone: #9e9e9e;
+    --chat-bg: #f8f9fa;
+    --user-msg: #dcf8c6;
+    --bot-msg: #e9ecef;
+    --primary-text: #2c3e50;
+    --secondary-text: #5a5a5a;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(180deg, #2c5f2d 0%, #1b3a1a 100%);
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+  }
+
+  .container {
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    text-align: center;
+    color: #fff;
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 10px 0 20px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    letter-spacing: 1px;
+  }
+
+  .status-bar {
+    text-align: center;
+    margin-bottom: 10px;
+    color: #8fbc8f;
+    font-size: 0.85rem;
+  }
+
+  /* Chat area - like WhatsApp */
+  #chat {
+    background: var(--chat-bg);
+    border-radius: 16px 16px 4px 4px;
+    padding: 20px 16px;
+    height: 500px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    border: 2px solid #ccc;
+    border-top: 4px solid var(--minecraft-green);
+    font-size: 0.95rem;
+  }
+
+  .msg {
+    margin: 12px 0;
+    padding: 12px 16px;
+    border-radius: 18px 18px 4px 18px;
+    max-width: 85%;
+    font-size: 14px;
+    line-height: 1.4;
+    position: relative;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+  }
+
+  .msg.user {
+    background: var(--user-msg);
+    margin-left: auto;
+    margin-right: 0;
+    color: var(--primary-text);
+    border-radius: 18px 18px 18px 4px;
+  }
+
+  .msg.bot {
+    background: var(--bot-msg);
+    margin-right: auto;
+    margin-left: 0;
+    color: var(--primary-text);
+    border-radius: 18px 18px 18px 4px;
+  }
+
+  /* WhatsApp-style message tail */
+  .msg::after {
+    content: '';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border: 8px solid transparent;
+  }
+
+  .msg.user::after {
+    border-left-color: var(--user-msg);
+    right: auto;
+    left: 12px;
+  }
+
+  .msg.bot::after {
+    border-right-color: var(--bot-msg);
+    right: 12px;
+  }
+
+  .msg .sender {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--secondary-text);
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+
+  .msg.user .sender { text-align: right; margin-left: auto; margin-bottom: 0; }
+  .msg.bot .sender { text-align: left; }
+
+  /* Input row - WhatsApp style */
+  #inputRow {
+    display: flex;
+    gap: 8px;
+    background: #fff;
+    border-radius: 24px 24px 4px 4px;
+    padding: 8px;
+    border: 2px solid #ddd;
+    backdrop-filter: blur(4px);
+  }
+
+  #userInput {
+    flex: 1;
+    border: none;
+    padding: 12px 16px;
+    font-size: 15px;
+    border-radius: 20px;
+    outline: none;
+    background: #f0f8f0;
+    transition: background 0.2s;
+  }
+
+  #userInput:focus {
+    background: #e8f5e9;
+  }
+
+  /* WhatsApp send button */
+  .send-btn {
+    background: var(--minecraft-green);
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    flex-shrink: 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+
+  .send-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(46, 204, 113, 0.4);
+  }
+
+  .send-btn:active {
+    transform: translateY(2px);
+  }
+
+  .send-btn:focus {
+    outline: 2px solid #27ae60;
+    outline-offset: 2px;
+  }
+
+  /* WhatsApp mic button */
+  .mic-btn {
+    background: none;
+    border: none;
+    color: var(--minecraft-dark-green);
+    cursor: pointer;
+    font-size: 1.4rem;
+    padding: 6px;
+    border-radius: 50%;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    min-width: 40px;
+    text-align: center;
+  }
+
+  .mic-btn:hover {
+    background: #e8f5e9;
+    color: var(--minecraft-green);
+  }
+
+  .mic-btn:focus {
+    outline: 2px solid var(--minecraft-green);
+    outline-offset: 2px;
+  }
+
+  .mic-btn.recording {
+    color: #e74c3c;
+    animation: pulse 1s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+  }
+
+  /* Speaker icons */
+  .speaker-en, .speaker-hi {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.1rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .msg:hover .speaker-en, .msg:hover .speaker-hi {
+    opacity: 0.7;
+  }
+
+  .speaker-en { color: #e74c3c; } /* Red like WhatsApp media */
+  .speaker-hi { color: #9b59b6; } /* Purple for Hindi */
+
+  /* Mic button in input row */
+  #micBtn {
+    background: none;
+    border: none;
+    color: var(--minecraft-dark-green);
+    cursor: pointer;
+    font-size: 1.3rem;
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 2px solid var(--minecraft-dark-green);
+    min-width: 36px;
+    transition: all 0.2s;
+  }
+
+  #micBtn:hover {
+    background: var(--minecraft-dark-green);
+    color: #fff;
+  }
+
+  #micBtn:focus {
+    outline: 2px solid var(--minecraft-green);
+    outline-offset: 2px;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0s !important;
+      transition-duration: 0s !important;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🌾 Kisan Mitra</h1>
+  <div class="status-bar" id="statusBar">Welcome to Kisan Mitra - Your farming assistant</div>
+  
+  <div id="chat"></div>
+  
+  <div id="inputRow">
+    <input type="text" id="userInput" placeholder="Type your message or click mic...">
+    <button id="micBtn" aria-label="Speech recognition" title="Click to record voice message" class="mic-btn">🎙️</button>
+    <button onclick="sendMessage()" class="send-btn">▶</button>
+  </div>
+</div>
+
+<script>
+const API_URL = "http://localhost:8000/chat";
+const chatDiv = document.getElementById("chat");
+const input = document.getElementById("userInput");
+
+// Check speech recognition support
+const recognitionAvailable = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+console.log('Speech recognition supported:', recognitionAvailable);
+
+// Initialize recognition
+let recognition = null;
+if (recognitionAvailable) {
+  const RecognitionClass = window.webkitSpeechRecognition || window.SpeechRecognition;
+  recognition = new RecognitionClass();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = 'en-US';
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    document.getElementById('userInput').value = transcript;
+    recognition.stop();
+    document.getElementById('micBtn').textContent = '🎙️';
+    document.getElementById('micBtn').classList.remove('recording');
+  };
+
+  recognition.onerror = (event) => {
+    console.error('Speech recognition error:', event.error);
+    document.getElementById('micBtn').textContent = '🎙️';
+    document.getElementById('micBtn').classList.remove('recording');
+  };
+
+  recognition.onend = () => {
+    document.getElementById('micBtn').textContent = '🎙️';
+    document.getElementById('micBtn').classList.remove('recording');
+  };
+}
+
+// Set up mic button
+const micBtn = document.getElementById('micBtn');
+let isListening = false;
+
+micBtn.onclick = function() {
+  if (!recognition) {
+    alert('Speech recognition not supported in this browser. Use Chrome or Edge.');
+    return;
+  }
+  if (isListening) {
+    recognition.stop();
+    isListening = false;
+    micBtn.textContent = '🎙️';
+    micBtn.classList.remove('recording');
+  } else {
+    recognition.start();
+    isListening = true;
+    micBtn.textContent = '⏹️';
+    micBtn.classList.add('recording');
+  }
+};
+
+async function sendMessage() {
+  const message = input.value.trim();
+  if (!message) return;
+  addMessage(message, "user");
+  input.value = "";
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message })
+    });
+    const data = await res.json();
+    addMessage(data.reply, "bot");
+  } catch (err) {
+    addMessage("Couldn't reach the server. Is it running?", "bot");
+  }
+}
+
+function addMessage(text, sender) {
+  const div = document.createElement("div");
+  div.className = "msg " + sender;
+
+  if (sender === "bot") {
+    const originalText = text;
+
+    div.textContent = text;
+    const speakerEn = document.createElement("span");
+    speakerEn.className = "speaker-en";
+    speakerEn.textContent = "E";
+    speakerEn.onclick = (e) => {
+      e.stopPropagation();
+      speakText(originalText, 'en-US');
+    };
+
+    const speakerHi = document.createElement("span");
+    speakerHi.className = "speaker-hi";
+    speakerHi.textContent = "H";
+    speakerHi.onclick = async (e) => {
+      e.stopPropagation();
+      const hindiText = await translateToHindi(originalText);
+      div.textContent = hindiText;
+      speakText(hindiText, 'hi');
+    };
+
+    div.appendChild(speakerEn);
+    div.appendChild(speakerHi);
+  } else {
+    div.textContent = text;
+  }
+
+  chatDiv.appendChild(div);
+  chatDiv.scrollTop = chatDiv.scrollHeight;
+}
+
+const hindiDict = {
+  "hello": "नमस्ते",
+  "how are you": "आप कैसे हैं",
+  "thank you": "धन्यवाद",
+  "please": "कृपया",
+  "yes": "हाँ",
+  "no": "नहीं",
+  "crop": "फसल",
+  "mandi": "मंडी",
+  "price": "कीमत",
+  "weather": "मौसम",
+  "rain": "बरसात",
+  "sun": "सूरज",
+  "wind": "हवा",
+  "seed": "बीज",
+  "fertilizer": "खाद",
+  "water": "पानी",
+  "harvest": "फसल कटाई",
+  "market": "बाज़ार",
+  "price": "कीमत",
+  "good": "अच्छा",
+  "bad": "बुरा",
+  "today": "आज",
+  "tomorrow": "कल",
+  "yesterday": "कल",
+  "help": "मदद",
+  "information": "जानकारी",
+  "scheme": "योजना",
+  "subsidy": "subsidy",
+  "loan": "कर्ज",
+};
+
+async function translateToHindi(text) {
+  const prompt = `Translate the following English text to Hindi. Output only the Hindi translation, nothing else - no explanations, no English, just the Hindi translation:\n\n${text}`;
+  try {
+    const translation = await puter.ai.chat(prompt, {
+      model: "gpt-5.4-nano"
+    });
+    return translation.text || translation || text;
+  } catch (err) {
+    console.error("Translation error:", err);
+    return text;
+  }
+}
+
+function speakText(text, lang = 'en-US') {
+  if (!window.speechSynthesis) return;
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = lang;
+  window.speechSynthesis.speak(utterance);
+}
+
+input.addEventListener("keydown", (e) => { if (e.key === "Enter") sendMessage(); });
+</script>
+
+<script src="https://js.puter.com/v2/"></script>
+</body>
+</html>

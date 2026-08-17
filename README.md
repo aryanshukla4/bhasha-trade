@@ -138,3 +138,95 @@ Authorization: Bearer <accessToken>
 - **Crop Health & Advisory**: `/api/crop/detect-disease`, `/api/crop/advisory/{crop_type}`
 - **Weather & Schemes**: `/api/weather`, `/api/schemes`, `/api/schemes/{id}`, `/api/schemes/{id}/check-eligibility`
 - **Reviews & Notifications**: `/api/reviews`, `/api/users/{id}/verification-status`, `/api/notifications`, `/api/notifications/subscribe`
+
+# Farmer Chatbot — Backend Starter
+
+A minimal FastAPI backend for a farming-focused chatbot: scoped system prompt,
+simple market-data retrieval from SQLite, and a Groq-powered LLM call.
+
+## 1. Open this inside WSL Ubuntu
+
+Unzip this folder somewhere **inside your Linux filesystem**, not `/mnt/c/...`
+— e.g.:
+
+```bash
+mkdir -p ~/projects
+mv ~/Downloads/farmer-chatbot.zip ~/projects/   # or wherever you unzipped it
+cd ~/projects/farmer-chatbot
+code .
+```
+
+`code .` opens it in VS Code connected to WSL (install the "WSL" extension
+in VS Code first if you haven't).
+
+## 2. Set up Python
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+## 3. Get a free Groq API key
+
+1. Go to https://console.groq.com and sign up (free)
+2. Create an API key
+3. Copy `.env.example` to `.env` and paste your key in:
+
+```bash
+cp .env.example .env
+```
+
+Check the Groq console for the current list of available free models —
+model names change over time, so confirm `GROQ_MODEL` in `.env` matches
+one that's currently listed there.
+
+## 4. Run the server
+
+```bash
+uvicorn app.main:app --reload
+```
+
+It starts at `http://localhost:8000`. First run auto-creates
+`data/mandi_prices.db` with a few sample crop prices (tomato, onion, wheat,
+cotton, soybean, rice) so you have something to test retrieval with.
+
+## 5. Test it
+
+Open `static/test.html` directly in your browser (just double-click it, or
+`python3 -m http.server 8080` from inside `static/` and visit
+`http://localhost:8080/test.html`). Try:
+
+- "What's the tomato price in Nashik?" → should use real DB data
+- "How do I control aphids on my cotton crop?" → general farming answer
+- "What's the capital of France?" → should politely decline / redirect
+
+## 6. Next steps
+
+- Swap the sample SQLite data for a real, regularly updated price source
+- Add the topic-guard safety net (a second lightweight check before the
+  main call) if you find the model straying off-topic
+- Once stable, containerize with Docker and deploy (Railway, Render, or a
+  small VPS all work well for a FastAPI app like this)
+- Replace the CORS `allow_origins=["*"]` with your real website domain
+  before going live
+- Swap `test.html`'s widget code into your actual website's frontend,
+  pointing `API_URL` at your deployed backend
+
+
+
+
+main.py — the entry point
+This is where FastAPI lives. When your browser sends a message, it hits the /chat route defined here. It doesn't do any "thinking" itself — its job is coordination: grab the message, ask retrieval.py if there's relevant market data, hand everything to prompts.py to assemble the final prompt, send that to Groq's API over HTTPS, and return the reply as JSON. It also has a /health route (just a sanity check) and CORS settings (currently *, meaning any website can call it — you'll lock this to your real domain later).
+
+retrieval.py — the market-data lookup
+Before your message reaches the AI, this file scans it for known crop names (using regex word-boundaries so "price" doesn't accidentally match "rice" — that bug we caught earlier). If it finds a crop, it fetches the latest rows for that crop from the database and returns them as plain text. If nothing matches, it returns nothing, and the chatbot answers using its general knowledge instead.
+
+database.py — the data layer
+This owns the actual SQLite file (data/mandi_prices.db). It defines the table structure (crop, market, price_per_quintal, date), creates it if missing, and seeds it with sample rows the first time it runs. retrieval.py is the only file that queries this — nothing else touches the database directly, which keeps things organized as the project grows.
+
+prompts.py — the personality and instructions
+This holds SYSTEM_PROMPT, the text that tells the model who it is, what topics to stick to, and how to handle off-topic questions. build_messages() combines that system prompt with any market data from retrieval.py and the farmer's actual question, into the exact format Groq's API expects.
+
+test.html — your test frontend
+A minimal standalone page so you can try the bot in a browser without touching your real website. It sends whatever you type to /chat and displays the reply.
