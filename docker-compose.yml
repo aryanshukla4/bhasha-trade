@@ -1,0 +1,28 @@
+services:
+  predict-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bhasha-trade-predict
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env   # provides KINDWISE_API_KEY at runtime; never baked into the image
+    volumes:
+      # Mount your trained model + class names read-only into the
+      # container, matching the PROJECT_ROOT paths predict_leaf.py expects.
+      - ./phase4_outputs:/app/phase4_outputs:ro
+      - ./phase1_outputs:/app/phase1_outputs:ro
+    environment:
+      # Overrides the PROJECT_ROOT inside predict_leaf.py/predict_server.py
+      # to match the paths as mounted inside the container (see note below
+      # on updating PROJECT_ROOT in your code to read this env var).
+      - PROJECT_ROOT=/app
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
