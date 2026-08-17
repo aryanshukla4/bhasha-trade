@@ -27,6 +27,7 @@ class LogoutRequest(BaseModel):
 
 class ProfileUpdateRequest(BaseModel):
     name: str | None = None
+    role: Literal["farmer", "buyer", "dealer"] | None = None
     preferredLanguage: str | None = None
     latitude: float | None = None
     longitude: float | None = None
@@ -61,7 +62,11 @@ class ProduceUpdateRequest(BaseModel):
 
 
 class InterestRequest(BaseModel):
+    quantity: float | None = Field(default=None, gt=0)
     offeredPrice: float | None = Field(default=None, gt=0)
+    deliveryAddress: str | None = None
+    paymentMethod: str | None = None
+    notes: str | None = None
 
 
 class BarterParseRequest(BaseModel):

@@ -235,6 +235,7 @@ export const api = {
 
   updateProfile: (payload: {
     name?: string
+    role?: Role
     preferredLanguage?: string
     latitude?: number
     longitude?: number
@@ -308,10 +309,19 @@ export const api = {
   deleteListing: (id: string) =>
     request<void>(`/api/produce/${encodeURIComponent(id)}`, { method: 'DELETE' }),
 
-  expressInterest: (id: string, offeredPrice?: number) =>
+  expressInterest: (
+    id: string,
+    payload?: {
+      quantity?: number
+      offeredPrice?: number
+      deliveryAddress?: string
+      paymentMethod?: string
+      notes?: string
+    },
+  ) =>
     request<Order>(`/api/produce/${encodeURIComponent(id)}/interest`, {
       method: 'POST',
-      body: offeredPrice ? { offeredPrice } : {},
+      body: payload ?? {},
     }),
 
   // --- Orders ------------------------------------------------------------

@@ -84,6 +84,11 @@ export interface Order {
   buyer_id: string
   farmer_id: string
   agreed_price: number
+  quantity?: number | null
+  total_price?: number | null
+  delivery_address?: string | null
+  payment_method?: string | null
+  notes?: string | null
   status: OrderStatus | string
   created_at: string
 }

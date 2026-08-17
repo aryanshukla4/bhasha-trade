@@ -53,7 +53,7 @@ const EMPTY_FORM: FormState = {
 export default function Produce() {
   const t = useT()
   const toast = useToast()
-  const { user, isFarmer } = useAuth()
+  const { user, isFarmer, setUser } = useAuth()
 
   const [tab, setTab] = useState<Tab>('browse')
   const [listings, setListings] = useState<ProduceListing[]>([])
@@ -71,6 +71,32 @@ export default function Produce() {
 
   const [deleting, setDeleting] = useState<ProduceListing | null>(null)
   const [deleteBusy, setDeleteBusy] = useState(false)
+
+  const [roleModalOpen, setRoleModalOpen] = useState(false)
+  const [roleSwitching, setRoleSwitching] = useState(false)
+
+  function handleNewListingClick() {
+    if (isFarmer) {
+      openCreate()
+    } else {
+      setRoleModalOpen(true)
+    }
+  }
+
+  async function handleSwitchRoleAndCreate() {
+    setRoleSwitching(true)
+    try {
+      const updated = await api.updateProfile({ role: 'farmer' })
+      setUser(updated)
+      toast.success(t('profileSaved'))
+      setRoleModalOpen(false)
+      openCreate()
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : t('somethingWrong'))
+    } finally {
+      setRoleSwitching(false)
+    }
+  }
 
   const location = useLocation()
 
@@ -240,9 +266,7 @@ export default function Produce() {
         action={
           <Button
             variant="primary"
-            onClick={openCreate}
-            disabled={!isFarmer}
-            title={isFarmer ? undefined : t('farmersOnly')}
+            onClick={handleNewListingClick}
           >
             <PlusIcon size={15} />
             {t('newListing')}
@@ -311,8 +335,8 @@ export default function Produce() {
         <EmptyState
           title={tab === 'mine' ? t('noMyListings') : t('noListings')}
           action={
-            tab === 'mine' && isFarmer ? (
-              <Button variant="primary" onClick={openCreate}>
+            tab === 'mine' ? (
+              <Button variant="primary" onClick={handleNewListingClick}>
                 <PlusIcon size={15} />
                 {t('newListing')}
               </Button>
@@ -544,6 +568,33 @@ export default function Produce() {
         {deleting && (
           <p className="mt-2 text-sm font-medium text-muted">{deleting.crop_type}</p>
         )}
+      </Modal>
+
+      <Modal
+        open={roleModalOpen}
+        onClose={() => setRoleModalOpen(false)}
+        title="Become a Farmer Seller"
+        footer={
+          <>
+            <Button onClick={() => setRoleModalOpen(false)}>{t('cancel')}</Button>
+            <Button
+              variant="primary"
+              loading={roleSwitching}
+              onClick={() => void handleSwitchRoleAndCreate()}
+            >
+              Switch Role to Farmer & Create Listing
+            </Button>
+          </>
+        }
+      >
+        <div className="space-y-3">
+          <p className="text-sm text-ink">
+            Your current account role is listed as a buyer or dealer. To list your harvest or produce for sale on Bhasha Trade, your account role needs to be set to <strong>Farmer</strong>.
+          </p>
+          <p className="text-xs text-muted">
+            Clicking below will switch your account role to Farmer so you can immediately post new produce listings.
+          </p>
+        </div>
       </Modal>
     </div>
   )

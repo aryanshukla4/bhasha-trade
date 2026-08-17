@@ -37,7 +37,11 @@ export default function ProduceDetail() {
   const [error, setError] = useState('')
 
   const [offerOpen, setOfferOpen] = useState(false)
+  const [orderQuantity, setOrderQuantity] = useState('')
   const [offeredPrice, setOfferedPrice] = useState('')
+  const [deliveryAddress, setDeliveryAddress] = useState('')
+  const [paymentMethod, setPaymentMethod] = useState('cod')
+  const [notes, setNotes] = useState('')
   const [offerBusy, setOfferBusy] = useState(false)
   const [offerError, setOfferError] = useState('')
 
@@ -50,6 +54,8 @@ export default function ProduceDetail() {
         const item = await api.listing(id)
         if (cancelled) return
         setListing(item)
+        setOrderQuantity(String(item.quantity))
+        setOfferedPrice(String(item.price_per_unit))
 
         // Seller trust signals — both public, both optional to the page.
         const [reviewResult, verificationResult] = await Promise.allSettled([
@@ -78,20 +84,46 @@ export default function ProduceDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
+  function openOrderModal() {
+    if (!listing) return
+    setOrderQuantity(String(listing.quantity))
+    setOfferedPrice(String(listing.price_per_unit))
+    setOfferError('')
+    setOfferOpen(true)
+  }
+
   async function handleOffer(event: FormEvent) {
     event.preventDefault()
+    if (!listing) return
     setOfferError('')
+    const qty = Number(orderQuantity)
+    const price = Number(offeredPrice)
+
+    if (!(qty > 0)) {
+      setOfferError(t('requiredField'))
+      return
+    }
+    if (qty > listing.quantity) {
+      setOfferError(`Quantity cannot exceed available stock (${listing.quantity} ${listing.unit})`)
+      return
+    }
+    if (!(price > 0)) {
+      setOfferError(t('requiredField'))
+      return
+    }
+
     setOfferBusy(true)
     try {
-      const price = offeredPrice.trim() ? Number(offeredPrice) : undefined
-      if (price !== undefined && !(price > 0)) {
-        setOfferError(t('requiredField'))
-        return
-      }
-      await api.expressInterest(id, price)
+      await api.expressInterest(id, {
+        quantity: qty,
+        offeredPrice: price,
+        deliveryAddress: deliveryAddress.trim() || undefined,
+        paymentMethod,
+        notes: notes.trim() || undefined,
+      })
       setOfferOpen(false)
       toast.success(t('interestSent'))
-      navigate('/orders')
+      navigate('/orders', { state: { prefill: { tab: 'buyer' } } })
     } catch (err) {
       setOfferError(err instanceof ApiError ? err.message : t('somethingWrong'))
     } finally {
@@ -202,8 +234,8 @@ export default function ProduceDetail() {
                 {isOwn ? (
                   <InfoNote tone="blue">{t('ownListingNote')}</InfoNote>
                 ) : canBuy ? (
-                  <Button variant="primary" size="md" className="rounded-xl px-6 py-2.5 font-semibold shadow-xs" onClick={() => setOfferOpen(true)}>
-                    🤝 {t('expressInterest')}
+                  <Button variant="primary" size="md" className="rounded-xl px-6 py-2.5 font-semibold shadow-xs" onClick={openOrderModal}>
+                    🤝 {t('expressInterest')} / Buy Now
                   </Button>
                 ) : (
                   <InfoNote tone="amber">{t('noResults')}</InfoNote>
@@ -274,34 +306,99 @@ export default function ProduceDetail() {
       <Modal
         open={offerOpen}
         onClose={() => setOfferOpen(false)}
-        title={t('expressInterest')}
+        title="🛒 Place Produce Order"
         footer={
           <>
             <Button onClick={() => setOfferOpen(false)}>{t('cancel')}</Button>
             <Button type="submit" form="offer-form" variant="primary" loading={offerBusy}>
-              {t('sendOffer')}
+              Confirm & Place Order
             </Button>
           </>
         }
       >
         <form id="offer-form" onSubmit={handleOffer} className="space-y-4">
           {offerError && <ErrorNote message={offerError} />}
-          <p className="text-sm text-muted">
-            {listing.crop_type} · {money(listing.price_per_unit)} / {listing.unit}
-          </p>
-          <Field
-            label={t('offeredPriceLabel')}
-            hint={t('offeredPriceHint')}
-            htmlFor="offeredPrice"
-          >
+          
+          <div className="rounded-xl bg-creamSoft/80 p-3.5 border border-leaf/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-bold text-ink">{listing.crop_type}</p>
+                <p className="text-xs text-muted">Listed price: {money(listing.price_per_unit)} / {listing.unit}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs font-semibold text-muted uppercase">Total Est.</p>
+                <p className="text-lg font-extrabold text-forest tabular-nums">
+                  {money((Number(orderQuantity) || 0) * (Number(offeredPrice) || 0))}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Field
+              label={t('quantityLabel')}
+              hint={`Stock: ${number(listing.quantity)} ${listing.unit}`}
+              htmlFor="orderQuantity"
+              required
+            >
+              <Input
+                id="orderQuantity"
+                type="number"
+                min="0.01"
+                max={listing.quantity}
+                step="0.01"
+                required
+                value={orderQuantity}
+                onChange={(event) => setOrderQuantity(event.target.value)}
+              />
+            </Field>
+
+            <Field
+              label={t('offeredPriceLabel')}
+              hint={t('offeredPriceHint')}
+              htmlFor="offeredPrice"
+              required
+            >
+              <Input
+                id="offeredPrice"
+                type="number"
+                min="0.01"
+                step="0.01"
+                required
+                value={offeredPrice}
+                onChange={(event) => setOfferedPrice(event.target.value)}
+              />
+            </Field>
+          </div>
+
+          <Field label="Delivery Address / Drop Location" htmlFor="deliveryAddress">
             <Input
-              id="offeredPrice"
-              type="number"
-              min="0.01"
-              step="0.01"
-              value={offeredPrice}
-              onChange={(event) => setOfferedPrice(event.target.value)}
-              placeholder={String(listing.price_per_unit)}
+              id="deliveryAddress"
+              value={deliveryAddress}
+              onChange={(event) => setDeliveryAddress(event.target.value)}
+              placeholder="e.g. Shop 12, Krishi Mandi, Nagpur"
+            />
+          </Field>
+
+          <Field label="Payment Preference" htmlFor="paymentMethod">
+            <select
+              id="paymentMethod"
+              className="w-full rounded-xl border border-line bg-white px-3 py-2 text-sm focus:border-forest focus:outline-none"
+              value={paymentMethod}
+              onChange={(event) => setPaymentMethod(event.target.value)}
+            >
+              <option value="cod">Cash on Delivery / Spot Payment</option>
+              <option value="upi">UPI / Online Direct Transfer</option>
+              <option value="mandi">Mandi Direct Slip / Credit</option>
+            </select>
+          </Field>
+
+          <Field label="Buyer Notes / Special Requirements" htmlFor="notes">
+            <Input
+              id="notes"
+              value={notes}
+              onChange={(event) => setNotes(event.target.value)}
+              placeholder="e.g. Require high grade moisture check / urgent delivery"
             />
           </Field>
         </form>

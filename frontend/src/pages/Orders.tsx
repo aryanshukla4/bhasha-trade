@@ -27,9 +27,9 @@ type Tab = 'buyer' | 'seller'
 export default function Orders() {
   const t = useT()
   const toast = useToast()
-  const { user } = useAuth()
+  const { user, isFarmer } = useAuth()
 
-  const [tab, setTab] = useState<Tab>('buyer')
+  const [tab, setTab] = useState<Tab>(isFarmer ? 'seller' : 'buyer')
   const [orders, setOrders] = useState<Order[]>([])
   /** listing_id -> listing, so rows can show crop names instead of raw ids. */
   const [listings, setListings] = useState<Record<string, ProduceListing>>({})
@@ -76,12 +76,14 @@ export default function Orders() {
       }
     } | null
 
-    if (s?.fromMagic && s.prefill?.tab) {
+    if (s?.prefill?.tab) {
       setTab(s.prefill.tab)
+    } else if (user?.role) {
+      setTab(user.role === 'farmer' ? 'seller' : 'buyer')
     }
     void load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.state])
+  }, [location.state, user?.role])
 
   async function act(order: Order, action: OrderAction) {
     setBusyId(order.id)
@@ -163,24 +165,30 @@ export default function Orders() {
         <EmptyState
           title={tab === 'buyer' ? t('noOrdersBuyer') : t('noOrdersSeller')}
           action={
-            tab === 'buyer' ? (
-              <Link to="/produce">
-                <Button variant="primary">{t('produceTitle')}</Button>
-              </Link>
-            ) : undefined
+            <Link to="/produce">
+              <Button variant="primary">
+                {tab === 'buyer' ? t('produceTitle') : t('newListing')}
+              </Button>
+            </Link>
           }
         />
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {visible.map((order) => {
             const listing = listings[order.listing_id]
             const isFarmerSide = order.farmer_id === user?.id
             const busy = busyId === order.id
 
-            // Mirrors order_action() in the backend, so no button can 409:
-            //   accept   -> farmer only, status must be pending
-            //   complete -> either party, status must be accepted
-            //   reject / cancel -> either party, any non-terminal status
+            const quantity = order.quantity ?? listing?.quantity
+            const totalPrice = order.total_price ?? (order.agreed_price * (quantity ?? 1))
+            const paymentLabel =
+              order.payment_method === 'upi'
+                ? '💳 UPI Online'
+                : order.payment_method === 'mandi'
+                ? '🏛️ Mandi Slip'
+                : '💵 Cash on Delivery'
+
+            // Mirrors order_action() in the backend:
             const canAccept = isFarmerSide && order.status === 'pending'
             const canComplete = order.status === 'accepted'
             const canDrop = order.status === 'pending' || order.status === 'accepted'
@@ -189,39 +197,66 @@ export default function Orders() {
             return (
               <Card key={order.id} className="p-5 rounded-2xl border border-leaf/30 bg-white/95 shadow-card transition-all hover:shadow-lift">
                 <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <div className="mb-1.5 flex flex-wrap items-center gap-2.5">
-                      <h3 className="text-base font-bold text-ink">
+                      <h3 className="text-lg font-bold text-ink">
                         {listing?.crop_type ?? t('loading')}
                       </h3>
                       <StatusBadge
                         status={order.status}
                         label={statusLabel(order.status, t)}
                       />
+                      <span className="rounded-lg bg-sageSoft px-2 py-0.5 text-xs font-medium text-forest">
+                        {paymentLabel}
+                      </span>
                     </div>
+
                     <p className="text-xs text-muted">
                       {t('orderRef', { id: shortId(order.id) })} ·{' '}
                       {t('orderPlaced', { date: shortDate(order.created_at) })}
                     </p>
+
+                    <div className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
+                      {quantity !== undefined && listing && (
+                        <div className="rounded-xl bg-creamSoft/50 px-3 py-1.5 border border-leaf/10">
+                          <span className="text-muted">Quantity: </span>
+                          <span className="font-bold text-ink">{quantity} {listing.unit}</span>
+                        </div>
+                      )}
+
+                      {order.delivery_address && (
+                        <div className="rounded-xl bg-creamSoft/50 px-3 py-1.5 border border-leaf/10">
+                          <span className="text-muted">📍 Drop Location: </span>
+                          <span className="font-semibold text-ink">{order.delivery_address}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {order.notes && (
+                      <p className="mt-2 text-xs italic text-muted">
+                        &quot;{order.notes}&quot;
+                      </p>
+                    )}
+
                     {listing && (
                       <Link
                         to={`/produce/${listing.id}`}
-                        className="mt-1.5 inline-block text-xs font-semibold text-forest hover:underline"
+                        className="mt-2 inline-block text-xs font-semibold text-forest hover:underline"
                       >
                         {t('schemeDetails')} →
                       </Link>
                     )}
                   </div>
 
-                  <div className="rounded-xl bg-creamSoft/70 px-3.5 py-2 text-right border border-leaf/15">
-                    <p className="text-[11px] font-medium text-muted">{t('agreedPrice')}</p>
-                    <p className="text-xl font-extrabold tabular-nums text-forest">
+                  <div className="rounded-xl bg-creamSoft/80 px-4 py-2.5 text-right border border-leaf/20">
+                    <p className="text-[11px] font-medium text-muted uppercase tracking-wider">{t('agreedPrice')}</p>
+                    <p className="text-xs font-semibold text-forest">
                       {money(order.agreed_price)}
-                      {listing && (
-                        <span className="ml-1 text-xs font-semibold text-forest/70">
-                          / {listing.unit}
-                        </span>
-                      )}
+                      {listing && <span> / {listing.unit}</span>}
+                    </p>
+                    <p className="mt-1 text-xs text-muted font-medium">Total Amount</p>
+                    <p className="text-xl font-extrabold tabular-nums text-forest">
+                      {money(totalPrice)}
                     </p>
                   </div>
                 </div>

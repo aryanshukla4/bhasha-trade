@@ -190,13 +190,14 @@ class BhashaTradeApiTests(unittest.TestCase):
         self.assertEqual(response.json()["data"]["status"], "cancelled")
 
     def test_auth_refresh_logout_and_profile_update(self):
-        session = self.login("+919111111111", "farmer", "Ramesh Kumar")
+        session = self.login("+919111111111", "buyer", "Ramesh Kumar")
         headers = {"Authorization": f"Bearer {session['accessToken']}"}
 
-        # Profile update
-        response = self.client.put("/api/auth/profile", headers=headers, json={"name": "Ramesh Singh", "preferredLanguage": "mr"})
+        # Profile update with role switch
+        response = self.client.put("/api/auth/profile", headers=headers, json={"name": "Ramesh Singh", "role": "farmer", "preferredLanguage": "mr"})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["data"]["name"], "Ramesh Singh")
+        self.assertEqual(response.json()["data"]["role"], "farmer")
         self.assertEqual(response.json()["data"]["preferredLanguage"], "mr")
 
         # Refresh token
@@ -208,6 +209,38 @@ class BhashaTradeApiTests(unittest.TestCase):
         # Logout
         response = self.client.post("/api/auth/logout", json={"refreshToken": session["refreshToken"]})
         self.assertEqual(response.status_code, 204)
+
+    def test_order_creation_with_quantity_and_delivery_details(self):
+        farmer = self.login("+919000000080", "farmer", "Farmer Kisan")
+        buyer = self.login("+919000000081", "buyer", "Buyer Vyapar")
+        farmer_headers = {"Authorization": f"Bearer {farmer['accessToken']}"}
+        buyer_headers = {"Authorization": f"Bearer {buyer['accessToken']}"}
+
+        # Create produce listing
+        res = self.client.post("/api/produce", headers=farmer_headers, json={"cropType": "Onion", "quantity": 500, "unit": "kg", "pricePerUnit": 15})
+        self.assertEqual(res.status_code, 201)
+        listing_id = res.json()["data"]["id"]
+
+        # Place direct order with custom quantity and delivery details
+        res = self.client.post(
+            f"/api/produce/{listing_id}/interest",
+            headers=buyer_headers,
+            json={
+                "quantity": 100,
+                "offeredPrice": 14,
+                "deliveryAddress": "123 Mandi Marg, Nagpur",
+                "paymentMethod": "upi",
+                "notes": "Deliver by tomorrow evening"
+            }
+        )
+        self.assertEqual(res.status_code, 201)
+        order = res.json()["data"]
+        self.assertEqual(order["quantity"], 100)
+        self.assertEqual(order["agreed_price"], 14)
+        self.assertEqual(order["total_price"], 1400)
+        self.assertEqual(order["delivery_address"], "123 Mandi Marg, Nagpur")
+        self.assertEqual(order["payment_method"], "upi")
+        self.assertEqual(order["notes"], "Deliver by tomorrow evening")
 
     def test_languages_and_user_language(self):
         session = self.login()

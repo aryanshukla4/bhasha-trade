@@ -47,7 +47,14 @@ class DomainService:
         item=self.listing(s,item_id)
         if item.status!='active':raise HTTPException(409,'Listing is unavailable')
         if item.farmer_id==user.id:raise HTTPException(422,'Cannot express interest in your own listing')
-        order=Order(id=ident('order'),listing_id=item.id,buyer_id=user.id,farmer_id=item.farmer_id,agreed_price=float(b.get('offeredPrice',item.price_per_unit)),status='pending');s.add(order);s.add(Notification(id=ident('notification'),user_id=item.farmer_id,type='order',title='New buyer interest',body='A buyer is interested in your listing.'));s.commit();return dto(order)
+        price=float(b.get('offeredPrice')) if b.get('offeredPrice') is not None else float(item.price_per_unit)
+        qty=float(b.get('quantity')) if b.get('quantity') is not None else float(item.quantity)
+        total=price*qty
+        order=Order(id=ident('order'),listing_id=item.id,buyer_id=user.id,farmer_id=item.farmer_id,agreed_price=price,quantity=qty,total_price=total,delivery_address=b.get('deliveryAddress'),payment_method=b.get('paymentMethod') or 'cod',notes=b.get('notes'),status='pending')
+        s.add(order)
+        s.add(Notification(id=ident('notification'),user_id=item.farmer_id,type='order',title='New buyer order / interest',body=f'A buyer placed an order / interest for {qty} {item.unit} of {item.crop_type}.'))
+        s.commit()
+        return dto(order)
     def order_action(self,s,user,order_id,action):
         if action not in ('accept','complete','reject','cancel'):
             raise HTTPException(422,'Invalid order action')
