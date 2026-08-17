@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-white text-ink font-sans antialiased;
+  }
+
+  /* Consistent, visible focus for keyboard users across every control. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand ring-offset-2 ring-offset-white;
+  }
+
+  /* Kill the number-input spinners; quantities read better without them. */
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+}
+
+@layer components {
+  /* Scrollable strips (nav rows, tab bars) that shouldn't show scrollbar
+     chrome. The content still scrolls by wheel, drag and keyboard. */
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Shared field chrome so inputs, selects and textareas can't drift apart. */
+  .field-base {
+    @apply w-full rounded-md border border-line bg-white px-3 py-2 text-sm text-ink
+           placeholder:text-muted/70 transition-colors
+           focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand
+           disabled:cursor-not-allowed disabled:bg-surface disabled:text-muted;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
