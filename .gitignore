@@ -6,5 +6,4 @@ __pycache__/
 *.pyc
 .venv/
 *.db
-backend/crop_model/
 *.pytest_cache
