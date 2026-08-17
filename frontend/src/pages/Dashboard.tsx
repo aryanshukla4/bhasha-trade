@@ -10,6 +10,7 @@ import {
   SunIcon,
 } from '../components/icons'
 import { Button, Card, EmptyState, Section, Spinner, cx } from '../components/ui'
+import { MagicButton } from '../components/MagicButton'
 import { api } from '../lib/api'
 import { useAuth } from '../lib/auth'
 import { money } from '../lib/format'
@@ -154,10 +155,21 @@ export default function Dashboard() {
           </p>
 
           <div className="mt-6 flex flex-wrap items-center gap-3">
+            <MagicButton
+              trigger={(open) => (
+                <Button
+                  variant="secondary"
+                  onClick={open}
+                  className="bg-cream text-forest border-0 font-extrabold hover:bg-creamSoft shadow-lift hover:scale-[1.02] active:scale-[0.98] ring-2 ring-gold/40"
+                >
+                  ✨ {t('magicButtonAsk')} (Magic AI) 🎙️
+                </Button>
+              )}
+            />
             <Link to="/chat">
               <Button
                 variant="secondary"
-                className="bg-cream text-forest border-0 font-bold hover:bg-creamSoft shadow-sm hover:scale-[1.02] active:scale-[0.98]"
+                className="bg-cream/15 text-cream border border-cream/30 font-medium hover:bg-cream/25 shadow-sm"
               >
                 🌱 {t('actionAskAssistant')}
               </Button>
@@ -171,6 +183,51 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* --- MAGIC AI BANNER CARD --- */}
+      <MagicButton
+        trigger={(open) => (
+          <div
+            onClick={open}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') open()
+            }}
+            className="group relative cursor-pointer overflow-hidden rounded-3xl border border-leaf/40 bg-gradient-to-r from-white/95 via-cream to-sageSoft/40 p-5 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:border-forest hover:shadow-lift"
+          >
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-forest to-[#0c590e] text-cream text-xl shadow-xs ring-2 ring-leaf/30 transition-transform group-hover:scale-105">
+                  ✨
+                </span>
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="text-sm font-extrabold text-forest group-hover:text-forestHover">
+                      {t('magicModalTitle')} • Voice & AI Action Router
+                    </h3>
+                    <span className="rounded-full bg-leafSoft px-2.5 py-0.5 text-[10px] font-bold text-forest border border-leaf/40">
+                      🎙️ Speak Naturally
+                    </span>
+                  </div>
+                  <p className="mt-0.5 text-xs text-muted leading-relaxed">
+                    Say "मुझे 50 क्विंटल गेहूं बेचना है", "What's the weather today?", "Barter tractor", or "Check mandi prices"
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                <span className="text-xs font-bold text-forest group-hover:underline">
+                  {t('magicProceed')}
+                </span>
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-forest text-cream text-xs transition-transform group-hover:translate-x-1 shadow-xs">
+                  →
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+      />
 
       {/* --- STATS OVERVIEW --- */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">

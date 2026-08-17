@@ -279,6 +279,30 @@ const mr: Translations = {
   statusConnected: 'जोडलेले',
   statusConfirmed: 'निश्चित',
   statusPhoneVerified: 'फोन पडताळला',
+
+  // Magic AI Action Button
+  magicButtonLabel: 'मॅजिक AI',
+  magicButtonAsk: 'भाषाला विचारा',
+  magicModalTitle: 'भाषा मॅजिक AI (आवाज सहाय्यक)',
+  magicModalSubtitle: 'मराठी, हिंदी किंवा इंग्रजीमध्ये बोला किंवा लिहा.',
+  magicListening: 'ऐकत आहे… कृपया बोला',
+  magicThinking: 'समजून घेत आहे…',
+  magicSpeakPrompt: 'उदा: "मला ५० क्विंटल गहू विकायचा आहे" किंवा "आजचे हवामान कसे आहे?"',
+  magicSuggestion1: 'आजचे हवामान कसे आहे?',
+  magicSuggestion2: 'मला ५० क्विंटल गहू विकायचा आहे',
+  magicSuggestion3: 'सोयाबीनचे बाजारभाव दाखवा',
+  magicSuggestion4: 'गहू देऊन खत हवे आहे',
+  magicSuggestion5: 'पिकांवर रोगाची लक्षणे दिसत आहेत',
+  magicPlaceholder: 'बोला किंवा लिहा (उदा. ५० क्विंटल गहू विकायचा आहे)…',
+  magicRoutingTo: '{destination} उघडत आहे…',
+  magicProceed: 'पुढे चला',
+  magicEdit: 'संपादित करा',
+  magicMicStart: 'आवाज सुरू करा',
+  magicMicStop: 'आवाज थांबवा',
+  magicMicUnsupported: 'या ब्राउझरमध्ये व्हॉइस इनपुट समर्थित नाही.',
+  magicUnrecognized: 'वैशिष्ट्य निश्चित करता आले नाही, AI सहाय्यकाकडे नेले जात आहे.',
+  magicExtractedEntities: 'ओळखलेली माहिती',
+  magicDestination: 'गंतव्य',
 }
 
 export default mr

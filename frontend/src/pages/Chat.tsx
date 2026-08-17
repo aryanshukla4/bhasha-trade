@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useLocation } from 'react-router-dom'
 import { LeafIcon, MicIcon, SendIcon, SpeakerIcon } from '../components/icons'
 import {
   Badge,
@@ -66,6 +67,9 @@ export default function Chat() {
   const locale = SPEECH_LOCALES[language] ?? 'en-IN'
   const micSupported = speechRecognitionSupported()
 
+  const location = useLocation()
+  const initialSentRef = useRef(false)
+
   useEffect(() => {
     let cancelled = false
     api
@@ -86,9 +90,23 @@ export default function Chat() {
             },
           ])
         setMessages(expanded)
+
+        // If navigated from Magic Button with a query, auto-send once
+        const initMsg = (location.state as { initialMessage?: string; query?: string } | null)?.initialMessage ||
+          (location.state as { initialMessage?: string; query?: string } | null)?.query
+        if (initMsg && !initialSentRef.current) {
+          initialSentRef.current = true
+          void send(initMsg)
+        }
       })
       .catch(() => {
         // An empty transcript is a fine starting state.
+        const initMsg = (location.state as { initialMessage?: string; query?: string } | null)?.initialMessage ||
+          (location.state as { initialMessage?: string; query?: string } | null)?.query
+        if (initMsg && !initialSentRef.current) {
+          initialSentRef.current = true
+          void send(initMsg)
+        }
       })
       .finally(() => {
         if (!cancelled) setLoadingHistory(false)
@@ -97,7 +115,7 @@ export default function Chat() {
       cancelled = true
       stopSpeaking()
     }
-  }, [])
+  }, [location.state])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })

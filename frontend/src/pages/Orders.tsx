@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import {
   Button,
   Card,
@@ -66,10 +66,22 @@ export default function Orders() {
     }
   }
 
+  const location = useLocation()
+
   useEffect(() => {
+    const s = location.state as {
+      fromMagic?: boolean
+      prefill?: {
+        tab?: 'buyer' | 'seller'
+      }
+    } | null
+
+    if (s?.fromMagic && s.prefill?.tab) {
+      setTab(s.prefill.tab)
+    }
     void load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [location.state])
 
   async function act(order: Order, action: OrderAction) {
     setBusyId(order.id)

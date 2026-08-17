@@ -6,6 +6,7 @@ import { useT } from '../lib/i18n'
 import { readState } from '../lib/readState'
 import type { TranslationKey } from '../lib/locales/en'
 import { LanguageSelect } from './LanguageSelect'
+import { MagicButton } from './MagicButton'
 import {
   BarterIcon,
   BellIcon,
@@ -218,6 +219,9 @@ export function Layout() {
       <main className="mx-auto w-full max-w-page flex-1 px-4 py-6 pb-24 sm:py-8 lg:pb-8">
         <Outlet />
       </main>
+
+      {/* Central Floating Magic AI Action Button */}
+      <MagicButton />
 
       <footer className="hidden border-t border-leaf/20 py-6 lg:block bg-creamSoft/30">
         <div className="mx-auto flex max-w-page items-center justify-between px-4 text-xs text-muted">

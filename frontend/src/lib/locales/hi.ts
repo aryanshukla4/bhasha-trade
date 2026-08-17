@@ -278,6 +278,30 @@ const hi: Translations = {
   statusConnected: 'जुड़ा',
   statusConfirmed: 'पक्का',
   statusPhoneVerified: 'फ़ोन सत्यापित',
+
+  // Magic AI Action Button
+  magicButtonLabel: 'जादुई AI',
+  magicButtonAsk: 'भाषा से पूछें',
+  magicModalTitle: 'भाषा मैजिक AI (आवाज़ साथी)',
+  magicModalSubtitle: 'हिंदी, अंग्रेजी या अपनी भाषा में सहजता से बोलें या लिखें।',
+  magicListening: 'सुन रहा हूँ… कृपया बोलें',
+  magicThinking: 'आपकी बात समझ रहा हूँ…',
+  magicSpeakPrompt: 'उदा: "मुझे 50 क्विंटल गेहूं बेचना है" या "आज का मौसम कैसा रहेगा?"',
+  magicSuggestion1: 'आज का मौसम कैसा रहेगा?',
+  magicSuggestion2: 'मुझे 50 क्विंटल गेहूं बेचना है',
+  magicSuggestion3: 'सोयाबीन का मंडी भाव बताओ',
+  magicSuggestion4: 'गेहूं के बदले खाद चाहिए',
+  magicSuggestion5: 'फसल के पत्ते पीले पड़ रहे हैं',
+  magicPlaceholder: 'बोलें या लिखें (उदा. 50 क्विंटल गेहूं बेचना है)…',
+  magicRoutingTo: '{destination} खोला जा रहा है…',
+  magicProceed: 'आगे बढ़ें',
+  magicEdit: 'संशोधित करें',
+  magicMicStart: 'आवाज़ शुरू करें',
+  magicMicStop: 'आवाज़ रोकें',
+  magicMicUnsupported: 'इस ब्राउज़र में वॉइस इनपुट समर्थित नहीं है। कृपया टाइप करें।',
+  magicUnrecognized: 'सटीक फीचर नहीं मिला, भाषा AI सहायक पर ले जाया जा रहा है।',
+  magicExtractedEntities: 'पहचानी गई जानकारी',
+  magicDestination: 'गंतव्य',
 }
 
 export default hi

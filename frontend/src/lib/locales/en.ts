@@ -291,6 +291,30 @@ const en = {
   statusConnected: 'Connected',
   statusConfirmed: 'Confirmed',
   statusPhoneVerified: 'Phone verified',
+
+  // Magic AI Action Button
+  magicButtonLabel: 'Magic AI',
+  magicButtonAsk: 'Ask Bhasha',
+  magicModalTitle: 'Bhasha Magic AI',
+  magicModalSubtitle: 'Speak or type naturally in Hindi, English, or regional languages.',
+  magicListening: 'Listening… Speak naturally',
+  magicThinking: 'Understanding your request…',
+  magicSpeakPrompt: 'Say something like: "I want to sell 50 quintal wheat" or "What is today’s weather?"',
+  magicSuggestion1: 'What’s the weather today?',
+  magicSuggestion2: 'Mujhe 50 quintal gehun bechna hai',
+  magicSuggestion3: 'Check mandi prices for soybean',
+  magicSuggestion4: 'Barter crop for fertilizer',
+  magicSuggestion5: 'My crop has leaf disease',
+  magicPlaceholder: 'Speak or type your request (e.g. Sell 20 kg tomatoes in Nagpur)…',
+  magicRoutingTo: 'Opening {destination}…',
+  magicProceed: 'Proceed Now',
+  magicEdit: 'Edit Query',
+  magicMicStart: 'Start Voice',
+  magicMicStop: 'Stop Voice',
+  magicMicUnsupported: 'Speech recognition is not supported in this browser. Please type your request.',
+  magicUnrecognized: 'Could not confidently determine feature. Routing to AI Assistant.',
+  magicExtractedEntities: 'Detected Details',
+  magicDestination: 'Destination',
 }
 
 export type Translations = typeof en

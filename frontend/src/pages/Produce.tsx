@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { EditIcon, PlusIcon, SearchIcon, TrashIcon } from '../components/icons'
 import {
   Button,
@@ -72,6 +72,8 @@ export default function Produce() {
   const [deleting, setDeleting] = useState<ProduceListing | null>(null)
   const [deleteBusy, setDeleteBusy] = useState(false)
 
+  const location = useLocation()
+
   async function load(filters?: { cropType?: string; state?: string }) {
     setLoading(true)
     setError('')
@@ -86,9 +88,58 @@ export default function Produce() {
   }
 
   useEffect(() => {
-    void load()
+    const state = location.state as {
+      fromMagic?: boolean
+      action?: string
+      intent?: string
+      prefill?: {
+        cropType?: string
+        cropFilter?: string
+        quantity?: number
+        unit?: string
+        pricePerUnit?: number
+        description?: string
+        district?: string
+        state?: string
+        stateFilter?: string
+      }
+    } | null
+
+    if (state?.fromMagic && state.prefill) {
+      const { prefill, action, intent } = state
+      if ((action === 'create' || intent === 'sell_produce') && isFarmer) {
+        setEditing(null)
+        setForm({
+          cropType: prefill.cropType || '',
+          quantity: prefill.quantity ? String(prefill.quantity) : '',
+          unit: prefill.unit || 'kg',
+          pricePerUnit: prefill.pricePerUnit ? String(prefill.pricePerUnit) : '',
+          description: prefill.description || '',
+          photoUrl: '',
+          state: prefill.state || '',
+          district: prefill.district || '',
+        })
+        setFormError('')
+        setFormOpen(true)
+        void load()
+      } else if (action === 'browse' || intent === 'buy_produce') {
+        const crop = prefill.cropFilter || prefill.cropType || ''
+        const loc = prefill.stateFilter || prefill.state || prefill.district || ''
+        setTab('browse')
+        if (crop) setCropFilter(crop)
+        if (loc) setStateFilter(loc)
+        void load({
+          cropType: crop.trim() || undefined,
+          state: loc.trim() || undefined,
+        })
+      } else {
+        void load()
+      }
+    } else {
+      void load()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [location.state])
 
   function handleSearch(event: FormEvent) {
     event.preventDefault()

@@ -1,4 +1,5 @@
-import { useRef, useState, type ChangeEvent, type DragEvent } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent, type DragEvent } from 'react'
+import { useLocation } from 'react-router-dom'
 import { AlertIcon, CameraIcon, CheckIcon, LeafIcon, SearchIcon } from '../components/icons'
 import {
   Badge,
@@ -106,6 +107,28 @@ export default function CropDoctor() {
       setAdvisoryBusy(false)
     }
   }
+
+  const location = useLocation()
+
+  useEffect(() => {
+    const s = location.state as {
+      fromMagic?: boolean
+      prefill?: {
+        cropType?: string
+      }
+    } | null
+
+    if (s?.fromMagic && s.prefill?.cropType) {
+      const crop = s.prefill.cropType
+      setAdvisoryCrop(crop)
+      setAdvisoryBusy(true)
+      api
+        .cropAdvisory(crop)
+        .then((res) => setAdvisory(res))
+        .catch(() => setAdvisory(null))
+        .finally(() => setAdvisoryBusy(false))
+    }
+  }, [location.state])
 
   return (
     <div>

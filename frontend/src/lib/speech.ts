@@ -40,6 +40,7 @@ export interface SpeechRecognitionLike extends EventTarget {
 type SpeechRecognitionCtor = new () => SpeechRecognitionLike
 
 function getRecognitionCtor(): SpeechRecognitionCtor | null {
+  if (typeof window === 'undefined') return null
   const w = window as unknown as {
     SpeechRecognition?: SpeechRecognitionCtor
     webkitSpeechRecognition?: SpeechRecognitionCtor
@@ -62,9 +63,14 @@ export function createRecognition(locale: string): SpeechRecognitionLike | null 
 /** Reads the transcript out of the event without assuming array methods. */
 export function transcriptOf(event: Event): string {
   const typed = event as SpeechRecognitionEventLike
+  if (!typed || !typed.results) return ''
   let out = ''
-  for (let i = typed.resultIndex; i < typed.results.length; i++) {
-    out += typed.results[i][0].transcript
+  const start = typeof typed.resultIndex === 'number' ? typed.resultIndex : 0
+  for (let i = start; i < typed.results.length; i++) {
+    const res = typed.results[i]
+    if (res && res[0] && typeof res[0].transcript === 'string') {
+      out += res[0].transcript
+    }
   }
   return out.trim()
 }

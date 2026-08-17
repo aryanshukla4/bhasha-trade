@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { useLocation } from 'react-router-dom'
 import { LocationIcon, SearchIcon } from '../components/icons'
 import {
   Button,
@@ -20,6 +21,7 @@ import type { MarketPrice } from '../lib/types'
 
 export default function Market() {
   const t = useT()
+  const location = useLocation()
 
   const [prices, setPrices] = useState<MarketPrice[]>([])
   const [loading, setLoading] = useState(true)
@@ -49,9 +51,32 @@ export default function Market() {
   }
 
   useEffect(() => {
-    void load()
+    const s = location.state as {
+      fromMagic?: boolean
+      prefill?: {
+        commodity?: string
+        state?: string
+        district?: string
+      }
+    } | null
+
+    if (s?.fromMagic && s.prefill) {
+      const comm = s.prefill.commodity || ''
+      const st = s.prefill.state || ''
+      const dist = s.prefill.district || ''
+      if (comm) setCommodity(comm)
+      if (st) setState(st)
+      if (dist) setDistrict(dist)
+      void load({
+        commodity: comm.trim() || undefined,
+        state: st.trim() || undefined,
+        district: dist.trim() || undefined,
+      })
+    } else {
+      void load()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [location.state])
 
   function handleSearch(event: FormEvent) {
     event.preventDefault()

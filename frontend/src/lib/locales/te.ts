@@ -279,6 +279,30 @@ const te: Translations = {
   statusConnected: 'కలిశారు',
   statusConfirmed: 'నిర్ధారించబడింది',
   statusPhoneVerified: 'ఫోన్ ధృవీకరించబడింది',
+
+  // Magic AI Action Button
+  magicButtonLabel: 'మ్యాజిక్ AI',
+  magicButtonAsk: 'భాషాను అడగండి',
+  magicModalTitle: 'భాషా మ్యాజిక్ AI (వాయిస్ సహాయకుడు)',
+  magicModalSubtitle: 'తెలుగు, హిందీ లేదా ఇంగ్లీషులో మాట్లాడండి లేదా రాయండి.',
+  magicListening: 'వింటోంది… మాట్లాడండి',
+  magicThinking: 'అర్థం చేసుకుంటోంది…',
+  magicSpeakPrompt: 'ఉదా: "నాకు 50 క్వింటాళ్ల గోధుమలు అమ్మాలి" లేదా "ఈరోజు వాతావరణం ఎలా ఉంది?"',
+  magicSuggestion1: 'ఈరోజు వాతావరణం ఎలా ఉంది?',
+  magicSuggestion2: 'నాకు 50 క్వింటాళ్ల గోధుమలు అమ్మాలి',
+  magicSuggestion3: 'మార్కెట్ ధరలను తనిఖీ చేయండి',
+  magicSuggestion4: 'ఎరువుల కోసం పంట మార్పిడి',
+  magicSuggestion5: 'పంటకు ఆకు తెగులు ఉంది',
+  magicPlaceholder: 'మాట్లాడండి లేదా టైప్ చేయండి…',
+  magicRoutingTo: '{destination} తెరవబడుతోంది…',
+  magicProceed: 'ముందుకు వెళ్లండి',
+  magicEdit: 'సవరించండి',
+  magicMicStart: 'వాయిస్ ప్రారంభించండి',
+  magicMicStop: 'వాయిస్ ఆపండి',
+  magicMicUnsupported: 'ఈ బ్రౌజర్‌లో వాయిస్ ఇన్‌పుట్ అందుబాటులో లేదు.',
+  magicUnrecognized: 'ఖచ్చితమైన ఫీచర్ కనుగొనబడలేదు, AI సహాయకుడికి మళ్ళించబడుతోంది.',
+  magicExtractedEntities: 'గుర్తించబడిన వివరాలు',
+  magicDestination: 'గమ్యస్థానం',
 }
 
 export default te

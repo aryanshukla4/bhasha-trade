@@ -279,6 +279,30 @@ const ta: Translations = {
   statusConnected: 'இணைக்கப்பட்டது',
   statusConfirmed: 'உறுதியானது',
   statusPhoneVerified: 'கைபேசி சரிபார்க்கப்பட்டது',
+
+  // Magic AI Action Button
+  magicButtonLabel: 'மேஜிக் AI',
+  magicButtonAsk: 'பாஷாவிடம் கேளுங்கள்',
+  magicModalTitle: 'பாஷா மேஜிக் AI (குரல் உதவியாளர்)',
+  magicModalSubtitle: 'தமிழ், இந்தி அல்லது ஆங்கிலத்தில் இயல்பாகப் பேசவும் அல்லது எழுதவும்.',
+  magicListening: 'கேட்கிறது… பேசுங்கள்',
+  magicThinking: 'புரிந்துகொள்கிறது…',
+  magicSpeakPrompt: 'உதா: "எனக்கு 50 குவிண்டால் கோதுமை விற்க வேண்டும்" அல்லது "இன்றைய வானிலை எப்படி இருக்கிறது?"',
+  magicSuggestion1: 'இன்றைய வானிலை எப்படி இருக்கிறது?',
+  magicSuggestion2: 'எனக்கு 50 குவிண்டால் கோதுமை விற்க வேண்டும்',
+  magicSuggestion3: 'சந்தை விலைகளைச் சரிபார்க்கவும்',
+  magicSuggestion4: 'உரத்திற்கு பயிர் பண்டமாற்று',
+  magicSuggestion5: 'பயிரில் இலை நோய் உள்ளது',
+  magicPlaceholder: 'பேசவும் அல்லது தட்டச்சு செய்யவும்…',
+  magicRoutingTo: '{destination} திறக்கிறது…',
+  magicProceed: 'தொடரவும்',
+  magicEdit: 'திருத்துக',
+  magicMicStart: 'குரலைத் தொடங்கு',
+  magicMicStop: 'குரலை நிறுத்து',
+  magicMicUnsupported: 'இந்த உலாவியில் குரல் உள்ளீடு ஆதரிக்கப்படவில்லை.',
+  magicUnrecognized: 'அம்சத்தை துல்லியமாக கண்டறிய முடியவில்லை, AI உதவியாளருக்கு மாற்றப்படுகிறது.',
+  magicExtractedEntities: 'கண்டறியப்பட்ட விவரங்கள்',
+  magicDestination: 'சேருமிடம்',
 }
 
 export default ta

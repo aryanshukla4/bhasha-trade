@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { useLocation } from 'react-router-dom'
 import { BarterIcon, CheckIcon, SearchIcon } from '../components/icons'
 import {
   Badge,
@@ -97,6 +98,34 @@ export default function Barter() {
       setDealersLoading(false)
     }
   }
+
+  const location = useLocation()
+
+  useEffect(() => {
+    const state = location.state as {
+      fromMagic?: boolean
+      prefill?: {
+        rawQuery?: string
+        itemWanted?: string
+        itemOffered?: string
+        qtyWanted?: number
+        qtyOffered?: number
+      }
+    } | null
+
+    if (state?.fromMagic && state.prefill) {
+      setTab('new')
+      if (state.prefill.rawQuery) setText(state.prefill.rawQuery)
+      if (state.prefill.itemWanted && WANTED_OPTIONS.includes(state.prefill.itemWanted)) {
+        setItemWanted(state.prefill.itemWanted)
+      }
+      if (state.prefill.itemOffered && OFFERED_OPTIONS.includes(state.prefill.itemOffered)) {
+        setItemOffered(state.prefill.itemOffered)
+      }
+      if (state.prefill.qtyWanted) setQtyWanted(String(state.prefill.qtyWanted))
+      if (state.prefill.qtyOffered) setQtyOffered(String(state.prefill.qtyOffered))
+    }
+  }, [location.state])
 
   useEffect(() => {
     if (tab === 'history' && history.length === 0) void loadHistory()
