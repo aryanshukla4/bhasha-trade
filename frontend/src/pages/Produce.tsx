@@ -269,24 +269,28 @@ export default function Produce() {
           }
         />
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {visible.map((listing) => {
             const owned = listing.farmer_id === user?.id
             return (
-              <Card key={listing.id} interactive className="flex flex-col overflow-hidden">
-                {listing.photo_url && (
+              <Card key={listing.id} interactive className="group flex flex-col overflow-hidden rounded-2xl border border-leaf/30 bg-white/95 shadow-card transition-all duration-200 hover:-translate-y-1 hover:shadow-lift hover:border-leaf/70">
+                {listing.photo_url ? (
                   <img
                     src={listing.photo_url}
                     alt={listing.crop_type}
-                    className="h-36 w-full border-b border-line object-cover"
+                    className="h-40 w-full border-b border-leaf/20 object-cover transition-transform duration-300 group-hover:scale-105"
                     onError={(event) => {
                       event.currentTarget.style.display = 'none'
                     }}
                   />
+                ) : (
+                  <div className="flex h-32 w-full items-center justify-center bg-gradient-to-br from-sageSoft/70 to-leafSoft/50 text-forest border-b border-leaf/20">
+                    <span className="text-3xl">🌾</span>
+                  </div>
                 )}
-                <div className="flex flex-1 flex-col p-4">
-                  <div className="mb-2 flex items-start justify-between gap-2">
-                    <h3 className="truncate text-sm font-semibold text-ink">
+                <div className="flex flex-1 flex-col p-5">
+                  <div className="mb-2.5 flex items-start justify-between gap-2">
+                    <h3 className="truncate text-base font-bold text-ink group-hover:text-forest transition-colors">
                       {listing.crop_type}
                     </h3>
                     <StatusBadge
@@ -295,38 +299,38 @@ export default function Produce() {
                     />
                   </div>
 
-                  <p className="text-lg font-semibold tabular-nums text-brand-text">
-                    {money(listing.price_per_unit)}
-                    <span className="ml-1 text-xs font-normal text-muted">
-                      / {listing.unit}
+                  <div className="my-1.5 flex items-baseline justify-between rounded-xl bg-creamSoft/70 px-3.5 py-2 border border-leaf/15">
+                    <p className="text-xl font-extrabold tabular-nums text-forest">
+                      {money(listing.price_per_unit)}
+                      <span className="ml-1 text-xs font-semibold text-forest/70">
+                        / {listing.unit}
+                      </span>
+                    </p>
+                    <span className="text-xs font-medium text-muted">
+                      {number(listing.quantity)} {listing.unit}
                     </span>
-                  </p>
-                  <p className="mt-0.5 text-xs text-muted">
-                    {t('availableQty', {
-                      qty: number(listing.quantity),
-                      unit: listing.unit,
-                    })}
-                  </p>
+                  </div>
 
                   {(listing.district || listing.state) && (
-                    <p className="mt-1 truncate text-xs text-muted">
-                      {[listing.district, listing.state].filter(Boolean).join(', ')}
+                    <p className="mt-2 flex items-center gap-1 truncate text-xs text-muted">
+                      <span>📍</span>
+                      <span>{[listing.district, listing.state].filter(Boolean).join(', ')}</span>
                     </p>
                   )}
 
                   {listing.description && (
-                    <p className="mt-2 line-clamp-2 text-xs text-muted">
+                    <p className="mt-2 line-clamp-2 text-xs text-muted/90 leading-relaxed">
                       {listing.description}
                     </p>
                   )}
 
-                  <p className="mt-2 text-xs text-muted">
+                  <p className="mt-2 text-[11px] text-muted">
                     {t('listedOn', { date: shortDate(listing.created_at) })}
                   </p>
 
-                  <div className="mt-4 flex gap-2">
+                  <div className="mt-4 flex gap-2 pt-2 border-t border-line/60">
                     <Link to={`/produce/${listing.id}`} className="flex-1">
-                      <Button size="sm" variant="primary" block>
+                      <Button size="sm" variant="primary" block className="rounded-xl font-semibold">
                         {owned ? t('schemeDetails') : t('expressInterest')}
                       </Button>
                     </Link>
@@ -337,6 +341,7 @@ export default function Produce() {
                           onClick={() => openEdit(listing)}
                           aria-label={t('edit')}
                           title={t('edit')}
+                          className="rounded-xl"
                         >
                           <EditIcon size={14} />
                         </Button>
@@ -346,6 +351,7 @@ export default function Produce() {
                           onClick={() => setDeleting(listing)}
                           aria-label={t('delete')}
                           title={t('delete')}
+                          className="rounded-xl"
                         >
                           <TrashIcon size={14} />
                         </Button>

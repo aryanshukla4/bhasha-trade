@@ -53,7 +53,7 @@ export function LanguageSelect({ compact = false }: { compact?: boolean }) {
         aria-label="Language"
         className={cx(
           'cursor-pointer appearance-none rounded-md border border-line bg-white py-1.5 pl-8 pr-7 text-sm text-ink',
-          'transition-colors hover:bg-surface focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand',
+          'transition-colors hover:bg-creamSoft focus:border-forest focus:outline-none focus:ring-1 focus:ring-forest',
           compact && 'py-1 text-xs',
         )}
       >

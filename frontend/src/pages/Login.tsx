@@ -81,29 +81,41 @@ export default function Login() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-surface">
-      <header className="border-b border-line bg-white">
-        <div className="mx-auto flex h-14 max-w-page items-center justify-between px-4">
-          <div className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-md bg-brand-soft text-brand">
-              <WheatIcon size={18} />
+    <div className="flex min-h-screen flex-col bg-transparent text-ink">
+      <header className="border-b border-leaf/25 bg-cream/90 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-page items-center justify-between px-4">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-forest to-[#0d5d10] text-cream shadow-xs ring-1 ring-leaf/40">
+              <WheatIcon size={20} />
             </span>
-            <span className="text-sm font-semibold tracking-tight text-ink">{t('appName')}</span>
+            <div>
+              <span className="block text-base font-bold tracking-tight text-forest leading-tight">
+                {t('appName')}
+              </span>
+              <span className="block text-[10px] font-medium tracking-wide text-muted -mt-0.5">
+                AgriTech AI Platform
+              </span>
+            </div>
           </div>
           <LanguageSelect />
         </div>
       </header>
 
-      <div className="flex flex-1 items-center justify-center px-4 py-10">
-        <div className="w-full max-w-sm">
-          <div className="mb-6 text-center">
-            <h1 className="text-2xl font-semibold tracking-tight text-ink">{t('loginTitle')}</h1>
-            <p className="mt-1.5 text-sm text-muted">
+      <div className="flex flex-1 items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md">
+          <div className="mb-7 text-center">
+            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-sageSoft to-leafSoft text-forest shadow-xs ring-1 ring-leaf/30">
+              <WheatIcon size={26} />
+            </div>
+            <h1 className="text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">
+              {t('loginTitle')}
+            </h1>
+            <p className="mt-1.5 text-xs sm:text-sm text-muted">
               {step === 'phone' ? t('loginSubtitle') : t('otpSentTo', { phone })}
             </p>
           </div>
 
-          <div className="rounded-lg border border-line bg-white p-5 shadow-card">
+          <div className="rounded-3xl border border-leaf/30 bg-white/95 p-6 sm:p-7 shadow-lift">
             {error && <ErrorNote message={error} className="mb-4" />}
 
             {step === 'phone' ? (
@@ -119,6 +131,7 @@ export default function Login() {
                     value={phone}
                     onChange={(event) => setPhone(event.target.value)}
                     placeholder={t('phonePlaceholder')}
+                    className="rounded-xl"
                   />
                 </Field>
                 <Button
@@ -127,8 +140,9 @@ export default function Login() {
                   block
                   loading={busy}
                   disabled={!phone.trim()}
+                  className="rounded-xl py-2.5 font-semibold shadow-xs"
                 >
-                  {t('sendOtp')}
+                  {t('sendOtp')} →
                 </Button>
               </form>
             ) : (

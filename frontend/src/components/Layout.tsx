@@ -70,23 +70,28 @@ export function Layout() {
   }, [location.pathname])
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
-      <header className="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur">
-        <div className="mx-auto flex min-h-14 max-w-page items-center gap-3 px-4 py-1.5">
-          <NavLink to="/" className="flex shrink-0 items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-md bg-brand-soft text-brand">
-              <WheatIcon size={18} />
+    <div className="flex min-h-screen flex-col bg-transparent text-ink">
+      <header className="sticky top-0 z-40 border-b border-leaf/25 bg-cream/90 backdrop-blur-md shadow-xs transition-colors">
+        <div className="mx-auto flex min-h-14 max-w-page items-center gap-3 px-4 py-2">
+          <NavLink to="/" className="group flex shrink-0 items-center gap-2.5">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-forest to-[#0d5d10] text-cream shadow-xs ring-1 ring-leaf/40 transition-transform group-hover:scale-105">
+              <WheatIcon size={20} />
             </span>
-            <span className="hidden text-sm font-semibold tracking-tight text-ink sm:block lg:hidden xl:block">
-              {t('appName')}
-            </span>
+            <div className="hidden sm:block lg:hidden xl:block">
+              <span className="block text-base font-bold tracking-tight text-forest leading-tight">
+                {t('appName')}
+              </span>
+              <span className="block text-[10px] font-medium tracking-wide text-muted -mt-0.5">
+                AgriTech AI Platform
+              </span>
+            </div>
           </NavLink>
 
           {/* Wraps rather than scrolls: Tamil and Telugu labels run much wider
               than Hindi, and a scrolling nav would hide items with no visible
               affordance. Wrapping grows the header a row and keeps every
               section reachable. min-w-0 stops it widening the page. */}
-          <nav className="hidden min-w-0 flex-1 flex-wrap items-center gap-0.5 lg:flex">
+          <nav className="hidden min-w-0 flex-1 flex-wrap items-center gap-1 lg:flex ml-2">
             {NAV.map(({ to, labelKey, Icon }) => (
               <NavLink
                 key={to}
@@ -94,10 +99,10 @@ export function Layout() {
                 end={to === '/'}
                 className={({ isActive }) =>
                   cx(
-                    'flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-1.5 text-sm font-medium transition-colors xl:px-2.5',
+                    'flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-2.5 py-1.5 text-sm font-medium transition-all duration-150',
                     isActive
-                      ? 'bg-brand-soft text-brand-text'
-                      : 'text-muted hover:bg-surface hover:text-ink',
+                      ? 'bg-forest text-cream font-semibold shadow-xs'
+                      : 'text-forest/75 hover:bg-leafSoft hover:text-forest',
                   )
                 }
               >
@@ -107,7 +112,7 @@ export function Layout() {
             ))}
           </nav>
 
-          <div className="ml-auto flex shrink-0 items-center gap-2">
+          <div className="ml-auto flex shrink-0 items-center gap-2.5">
             <LanguageSelect />
 
             <NavLink
@@ -115,16 +120,16 @@ export function Layout() {
               aria-label={t('navNotifications')}
               className={({ isActive }) =>
                 cx(
-                  'relative rounded-md p-2 transition-colors',
+                  'relative rounded-xl p-2 transition-all duration-150',
                   isActive
-                    ? 'bg-brand-soft text-brand-text'
-                    : 'text-muted hover:bg-surface hover:text-ink',
+                    ? 'bg-forest text-cream shadow-xs'
+                    : 'text-muted hover:bg-leafSoft hover:text-forest',
                 )
               }
             >
               <BellIcon size={18} />
               {unread > 0 && (
-                <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-semibold text-white">
+                <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-bold text-white shadow-xs">
                   {unread > 9 ? '9+' : unread}
                 </span>
               )}
@@ -136,10 +141,10 @@ export function Layout() {
                 onClick={() => setMenuOpen((open) => !open)}
                 aria-expanded={menuOpen}
                 aria-haspopup="menu"
-                className="flex items-center gap-2 rounded-md border border-line px-2 py-1.5 text-sm text-ink transition-colors hover:bg-surface"
+                className="flex items-center gap-2 rounded-xl border border-leaf/30 bg-white/90 px-2.5 py-1.5 text-sm font-medium text-forest shadow-2xs transition-all hover:bg-creamSoft hover:border-leaf"
               >
-                <UserIcon size={16} className="text-muted" />
-                <span className="hidden max-w-24 truncate sm:block">
+                <UserIcon size={16} className="text-forest/70" />
+                <span className="hidden max-w-28 truncate sm:block">
                   {user?.name || user?.phone || t('navProfile')}
                 </span>
               </button>
@@ -153,10 +158,10 @@ export function Layout() {
                   />
                   <div
                     role="menu"
-                    className="absolute right-0 z-20 mt-1.5 w-52 overflow-hidden rounded-lg border border-line bg-white py-1 shadow-lift"
+                    className="absolute right-0 z-20 mt-2 w-56 overflow-hidden rounded-2xl border border-leaf/30 bg-white/95 p-1.5 shadow-lift backdrop-blur-md animate-in fade-in zoom-in-95 duration-100"
                   >
-                    <div className="border-b border-line px-3 py-2">
-                      <p className="truncate text-sm font-medium text-ink">
+                    <div className="border-b border-line/70 px-3.5 py-2.5">
+                      <p className="truncate text-sm font-semibold text-ink">
                         {user?.name || t('navProfile')}
                       </p>
                       <p className="truncate text-xs text-muted">{user?.phone}</p>
@@ -164,16 +169,16 @@ export function Layout() {
                     <NavLink
                       to="/profile"
                       role="menuitem"
-                      className="flex items-center gap-2 px-3 py-2 text-sm text-ink transition-colors hover:bg-surface"
+                      className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-ink transition-colors hover:bg-leafSoft hover:text-forest"
                     >
-                      <UserIcon size={15} className="text-muted" />
+                      <UserIcon size={15} className="text-forest/70" />
                       {t('profileTitle')}
                     </NavLink>
                     <button
                       type="button"
                       role="menuitem"
                       onClick={() => void signOut()}
-                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-danger transition-colors hover:bg-danger-soft"
+                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-danger transition-colors hover:bg-danger-soft"
                     >
                       <LogoutIcon size={15} />
                       {t('signOut')}
@@ -186,7 +191,7 @@ export function Layout() {
         </div>
 
         {/* Secondary row keeps every section reachable between lg and mobile. */}
-        <div className="border-t border-line lg:hidden">
+        <div className="border-t border-leaf/15 lg:hidden">
           <nav className="no-scrollbar mx-auto flex max-w-page gap-1 overflow-x-auto px-3 py-1.5">
             {NAV.map(({ to, labelKey, Icon }) => (
               <NavLink
@@ -195,10 +200,10 @@ export function Layout() {
                 end={to === '/'}
                 className={({ isActive }) =>
                   cx(
-                    'flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors',
+                    'flex shrink-0 items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs font-medium transition-colors',
                     isActive
-                      ? 'bg-brand-soft text-brand-text'
-                      : 'text-muted hover:bg-surface hover:text-ink',
+                      ? 'bg-forest text-cream font-semibold shadow-xs'
+                      : 'text-muted hover:bg-leafSoft hover:text-forest',
                   )
                 }
               >
@@ -214,15 +219,22 @@ export function Layout() {
         <Outlet />
       </main>
 
-      <footer className="hidden border-t border-line py-5 lg:block">
+      <footer className="hidden border-t border-leaf/20 py-6 lg:block bg-creamSoft/30">
         <div className="mx-auto flex max-w-page items-center justify-between px-4 text-xs text-muted">
-          <span>{t('appName')}</span>
-          <span>{t('appTagline')}</span>
+          <div className="flex items-center gap-2">
+            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-forest text-cream text-[10px]">
+              🌾
+            </span>
+            <span className="font-semibold text-forest">{t('appName')}</span>
+            <span>—</span>
+            <span>{t('appTagline')}</span>
+          </div>
+          <span className="text-forest/60 font-medium">Digital Agriculture & AI Marketplace</span>
         </div>
       </footer>
 
       {/* Mobile bottom bar — thumb-reachable for the five most-used sections. */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white lg:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-leaf/20 bg-cream/95 backdrop-blur-lg shadow-lift lg:hidden">
         <div className="mx-auto flex max-w-page">
           {NAV.filter((item) => item.primary).map(({ to, labelKey, Icon }) => (
             <NavLink
@@ -231,13 +243,23 @@ export function Layout() {
               end={to === '/'}
               className={({ isActive }) =>
                 cx(
-                  'flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-medium transition-colors',
-                  isActive ? 'text-brand-text' : 'text-muted',
+                  'relative flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-medium transition-colors',
+                  isActive ? 'text-forest font-bold' : 'text-muted hover:text-forest',
                 )
               }
             >
-              <Icon size={19} />
-              <span className="max-w-full truncate px-1">{t(labelKey)}</span>
+              {({ isActive }) => (
+                <>
+                  <Icon size={19} />
+                  <span className="max-w-full truncate px-1">{t(labelKey)}</span>
+                  <span
+                    className={cx(
+                      'h-1 w-1 rounded-full transition-all',
+                      isActive ? 'bg-forest scale-100' : 'bg-transparent scale-0',
+                    )}
+                  />
+                </>
+              )}
             </NavLink>
           ))}
         </div>

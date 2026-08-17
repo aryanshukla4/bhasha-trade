@@ -121,39 +121,55 @@ export default function Notifications() {
       ) : items.length === 0 ? (
         <EmptyState title={t('noNotifications')} icon={<BellIcon size={24} />} />
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-3">
           {items.map((item) => {
             const isUnread = !item.is_read && !readIds.has(item.id)
             const Icon = item.type === 'barter' ? BarterIcon : OrdersIcon
             return (
               <Card
                 key={item.id}
-                className={cx('p-4 transition-colors', isUnread && 'border-brand-border bg-brand-soft/40')}
+                className={cx(
+                  'p-5 rounded-2xl border transition-all hover:shadow-lift',
+                  isUnread
+                    ? 'border-forest/50 bg-white/95 shadow-card'
+                    : 'border-leaf/25 bg-white/80 opacity-90',
+                )}
               >
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-3.5">
                   <span
                     className={cx(
-                      'flex h-8 w-8 shrink-0 items-center justify-center rounded-md',
-                      isUnread ? 'bg-brand-soft text-brand' : 'bg-surface text-muted',
+                      'flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl shadow-xs ring-1',
+                      isUnread
+                        ? 'bg-gradient-to-br from-sageSoft to-leafSoft text-forest ring-leaf/40'
+                        : 'bg-creamSoft text-muted ring-line/50',
                     )}
                   >
-                    <Icon size={16} />
+                    <Icon size={18} />
                   </span>
 
                   <div className="min-w-0 flex-1">
-                    <div className="mb-0.5 flex flex-wrap items-center gap-2">
-                      <p className="text-sm font-medium text-ink">{item.title}</p>
-                      <Badge tone={item.type === 'barter' ? 'blue' : 'neutral'}>
+                    <div className="mb-1 flex flex-wrap items-center gap-2">
+                      <p className="text-base font-bold text-ink">{item.title}</p>
+                      <Badge tone={item.type === 'barter' ? 'blue' : 'green'}>
                         {item.type}
                       </Badge>
-                      {isUnread && <span className="h-2 w-2 rounded-full bg-brand" />}
+                      {isUnread && (
+                        <span className="flex h-2 w-2 rounded-full bg-forest animate-pulse" />
+                      )}
                     </div>
-                    <p className="text-sm text-muted">{item.body}</p>
-                    <p className="mt-1 text-xs text-muted">{dateTime(item.created_at)}</p>
+                    <p className="text-xs sm:text-sm text-ink/80 leading-relaxed">{item.body}</p>
+                    <p className="mt-1.5 text-[11px] font-medium text-muted">
+                      {dateTime(item.created_at)}
+                    </p>
                   </div>
 
                   {isUnread && (
-                    <Button size="sm" variant="ghost" onClick={() => markRead([item.id])}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="rounded-xl text-xs font-semibold hover:bg-leafSoft text-forest"
+                      onClick={() => markRead([item.id])}
+                    >
                       {t('markAllRead')}
                     </Button>
                   )}

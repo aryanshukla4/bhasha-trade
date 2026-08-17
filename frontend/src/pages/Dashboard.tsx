@@ -9,7 +9,7 @@ import {
   PlusIcon,
   SunIcon,
 } from '../components/icons'
-import { Button, Card, EmptyState, Section, Spinner } from '../components/ui'
+import { Button, Card, EmptyState, Section, Spinner, cx } from '../components/ui'
 import { api } from '../lib/api'
 import { useAuth } from '../lib/auth'
 import { money } from '../lib/format'
@@ -130,45 +130,130 @@ export default function Dashboard() {
   ]
 
   return (
-    <div>
-      <div className="mb-7">
-        <h1 className="text-xl font-semibold tracking-tight text-ink sm:text-2xl">
-          {user?.name ? t('greeting', { name: user.name }) : t('greetingAnonymous')}
-        </h1>
-        <p className="mt-1 text-sm text-muted">{t('dashboardSubtitle')}</p>
+    <div className="space-y-8">
+      {/* --- HERO BANNER --- */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-forest via-[#0a520c] to-[#126b15] p-6 sm:p-8 text-cream shadow-lift">
+        {/* Subtle background ambient circles */}
+        <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-leaf/10 blur-2xl" />
+        <div className="pointer-events-none absolute -bottom-16 right-1/3 h-52 w-52 rounded-full bg-gold/15 blur-xl" />
+
+        <div className="relative z-10 max-w-2xl">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cream/20 bg-cream/15 px-3.5 py-1 text-xs font-medium text-cream backdrop-blur-md shadow-xs">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-leaf opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-leaf" />
+            </span>
+            <span>AI Mandi Engine Active • बहुभाषी कृषि साथी</span>
+          </div>
+
+          <h1 className="text-2xl font-extrabold tracking-tight sm:text-4xl text-cream leading-tight">
+            {user?.name ? t('greeting', { name: user.name }) : t('greetingAnonymous')}
+          </h1>
+          <p className="mt-2 text-sm sm:text-base text-cream/90 font-normal leading-relaxed">
+            {t('dashboardSubtitle')} Your smart assistant for mandi rates, crop health, direct trade & government schemes.
+          </p>
+
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <Link to="/chat">
+              <Button
+                variant="secondary"
+                className="bg-cream text-forest border-0 font-bold hover:bg-creamSoft shadow-sm hover:scale-[1.02] active:scale-[0.98]"
+              >
+                🌱 {t('actionAskAssistant')}
+              </Button>
+            </Link>
+            <Link
+              to="/market"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-cream/30 bg-cream/10 px-4 py-2 text-sm font-medium text-cream backdrop-blur-sm transition-all hover:bg-cream/20"
+            >
+              📊 {t('actionCheckPrices')} →
+            </Link>
+          </div>
+        </div>
       </div>
 
-      <div className="mb-8 grid grid-cols-3 gap-3">
-        {stats.map((stat) => (
-          <Link key={stat.label} to={stat.to} className="block">
-            <Card interactive className="px-4 py-3.5">
-              <p className="text-2xl font-semibold tabular-nums text-ink">
-                {loading ? <Spinner size={18} className="text-muted" /> : stat.value}
-              </p>
-              <p className="mt-0.5 text-xs text-muted">{stat.label}</p>
+      {/* --- STATS OVERVIEW --- */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {stats.map((stat, i) => (
+          <Link key={stat.label} to={stat.to} className="group block">
+            <Card
+              interactive
+              className="relative overflow-hidden p-5 transition-all duration-200 group-hover:-translate-y-1 group-hover:shadow-lift"
+            >
+              {/* Accent top stripe */}
+              <div
+                className={cx(
+                  'absolute inset-x-0 top-0 h-1',
+                  i === 0 ? 'bg-forest' : i === 1 ? 'bg-sage' : 'bg-gold',
+                )}
+              />
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wider text-muted">
+                    {stat.label}
+                  </p>
+                  <p className="mt-1 text-3xl font-extrabold tabular-nums text-ink">
+                    {loading ? <Spinner size={22} className="text-forest" /> : stat.value}
+                  </p>
+                </div>
+                <span
+                  className={cx(
+                    'flex h-11 w-11 items-center justify-center rounded-2xl shadow-xs transition-transform group-hover:scale-110',
+                    i === 0
+                      ? 'bg-sageSoft text-forest'
+                      : i === 1
+                        ? 'bg-leafSoft text-forest'
+                        : 'bg-goldSoft text-soil',
+                  )}
+                >
+                  {i === 0 ? (
+                    <BarterIcon size={20} />
+                  ) : i === 1 ? (
+                    <LeafIcon size={20} />
+                  ) : (
+                    <SunIcon size={20} />
+                  )}
+                </span>
+              </div>
+              <div className="mt-3 flex items-center gap-1 text-xs font-medium text-forest group-hover:underline">
+                <span>{t('viewAll')}</span>
+                <span>→</span>
+              </div>
             </Card>
           </Link>
         ))}
       </div>
 
+      {/* --- QUICK ACTIONS --- */}
       <Section title={t('quickActions')}>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
           {actions.map(({ to, Icon, title, hint }) => (
-            <Link key={title} to={to}>
-              <Card interactive className="flex h-full items-start gap-3 p-4">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-brand-soft text-brand">
-                  <Icon size={18} />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-ink">{title}</p>
-                  <p className="mt-0.5 text-xs text-muted">{hint}</p>
+            <Link key={title} to={to} className="group block">
+              <Card
+                interactive
+                className="flex h-full items-start justify-between gap-3 p-4.5 transition-all duration-200 group-hover:-translate-y-0.5 group-hover:border-leaf/70"
+              >
+                <div className="flex items-start gap-3.5">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-sageSoft to-leafSoft text-forest shadow-xs ring-1 ring-leaf/40 transition-transform group-hover:scale-105">
+                    <Icon size={20} />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-ink group-hover:text-forest transition-colors">
+                      {title}
+                    </p>
+                    <p className="mt-0.5 text-xs text-muted leading-relaxed">{hint}</p>
+                  </div>
                 </div>
+                <span className="shrink-0 text-muted/60 transition-transform group-hover:translate-x-1 group-hover:text-forest">
+                  →
+                </span>
               </Card>
             </Link>
           ))}
         </div>
       </Section>
 
+      {/* --- MANDI PRICES & WEATHER --- */}
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <Section
@@ -176,39 +261,45 @@ export default function Dashboard() {
             action={
               <Link
                 to="/market"
-                className="text-xs font-medium text-brand-text hover:underline"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-forest hover:underline"
               >
-                {t('viewAll')}
+                <span>{t('viewAll')}</span>
+                <span>→</span>
               </Link>
             }
           >
             {loading ? (
-              <Card className="p-6">
-                <Spinner className="mx-auto text-muted" />
+              <Card className="p-8">
+                <Spinner className="mx-auto text-forest" />
               </Card>
             ) : prices.length === 0 ? (
               <EmptyState title={t('noResults')} />
             ) : (
-              <Card>
-                <ul className="divide-y divide-line">
+              <Card className="overflow-hidden">
+                <ul className="divide-y divide-line/60">
                   {prices.slice(0, 5).map((price) => (
                     <li
                       key={price.id}
-                      className="flex items-center justify-between gap-3 px-4 py-3"
+                      className="flex items-center justify-between gap-3 px-5 py-3.5 transition-colors hover:bg-creamSoft/50"
                     >
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium text-ink">
-                          {price.commodity}
-                        </p>
-                        <p className="truncate text-xs text-muted">
-                          {price.mandi_name} · {price.district}
-                        </p>
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sageSoft text-forest font-bold text-xs">
+                          🌾
+                        </span>
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold text-ink">
+                            {price.commodity}
+                          </p>
+                          <p className="truncate text-xs text-muted">
+                            {price.mandi_name} · {price.district}
+                          </p>
+                        </div>
                       </div>
                       <div className="shrink-0 text-right">
-                        <p className="text-sm font-semibold text-brand-text">
+                        <p className="text-base font-bold tabular-nums text-forest">
                           {money(price.modal_price)}
                         </p>
-                        <p className="text-xs text-muted">{t('perQuintal')}</p>
+                        <p className="text-[11px] font-medium text-muted">{t('perQuintal')}</p>
                       </div>
                     </li>
                   ))}
@@ -220,29 +311,51 @@ export default function Dashboard() {
 
         <div>
           <Section title={t('weatherTitle')}>
-            <Card className="p-4">
-              <div className="mb-3 flex items-center gap-2 text-muted">
-                <SunIcon size={18} />
-                <span className="text-sm font-medium text-ink">{t('weatherTitle')}</span>
+            <Card className="relative overflow-hidden p-5">
+              <div className="pointer-events-none absolute -right-6 -top-6 h-28 w-28 rounded-full bg-gold/10 blur-xl" />
+
+              <div className="mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-goldSoft text-gold shadow-2xs">
+                    <SunIcon size={20} />
+                  </span>
+                  <span className="text-sm font-bold text-ink">{t('weatherTitle')}</span>
+                </div>
+                {weatherState === 'ready' && (
+                  <span className="inline-flex items-center rounded-full bg-leafSoft px-2.5 py-0.5 text-[11px] font-semibold text-forest">
+                    Live GPS
+                  </span>
+                )}
               </div>
 
               {weatherState === 'ready' && weather ? (
-                <div className="space-y-2">
-                  <p className="text-xs text-muted">
-                    {weather.location.lat.toFixed(3)}, {weather.location.lon.toFixed(3)}
-                  </p>
-                  <p className="text-sm text-ink">
-                    {weather.alerts.length === 0
-                      ? t('weatherNoAlerts')
-                      : `${weather.alerts.length}`}
-                  </p>
+                <div className="space-y-3">
+                  <div className="rounded-xl bg-creamSoft/70 p-3 border border-leaf/20">
+                    <p className="text-xs text-muted">{t('locationLabel')}</p>
+                    <p className="text-sm font-medium text-forest">
+                      {weather.location.lat.toFixed(3)}° N, {weather.location.lon.toFixed(3)}° E
+                    </p>
+                  </div>
+                  <div className="rounded-xl bg-creamSoft/70 p-3 border border-leaf/20">
+                    <p className="text-xs text-muted">Alerts Status</p>
+                    <p className="text-sm font-medium text-ink">
+                      {weather.alerts.length === 0
+                        ? t('weatherNoAlerts')
+                        : `${weather.alerts.length} active alert(s)`}
+                    </p>
+                  </div>
                 </div>
               ) : weatherState === 'loading' ? (
-                <Spinner className="text-muted" />
+                <div className="py-6 text-center">
+                  <Spinner className="mx-auto text-forest" />
+                  <p className="mt-2 text-xs text-muted">Fetching local forecast…</p>
+                </div>
               ) : (
                 <div className="space-y-3">
-                  <p className="text-sm text-muted">{t('weatherNeedsLocation')}</p>
-                  <Button size="sm" onClick={loadWeather}>
+                  <p className="text-xs text-muted leading-relaxed">
+                    {t('weatherNeedsLocation')}
+                  </p>
+                  <Button size="sm" variant="secondary" onClick={loadWeather} className="w-full">
                     <LocationIcon size={14} />
                     {t('enableLocation')}
                   </Button>

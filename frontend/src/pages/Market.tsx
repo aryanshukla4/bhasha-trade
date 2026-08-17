@@ -120,14 +120,15 @@ export default function Market() {
         }
       />
 
-      <Card className="mb-6 p-4">
-        <form onSubmit={handleSearch} className="grid gap-3 sm:grid-cols-4">
+      <Card className="mb-8 p-5 rounded-2xl border border-leaf/30 bg-white/90 shadow-card">
+        <form onSubmit={handleSearch} className="grid gap-3.5 sm:grid-cols-4">
           <Field label={t('commodityLabel')} htmlFor="commodity">
             <Input
               id="commodity"
               value={commodity}
               onChange={(event) => setCommodity(event.target.value)}
-              placeholder="Wheat"
+              placeholder="e.g. Wheat, Rice, Soybean"
+              className="rounded-xl"
             />
           </Field>
           <Field label={t('stateLabel')} htmlFor="state">
@@ -136,6 +137,7 @@ export default function Market() {
               value={state}
               onChange={(event) => setState(event.target.value)}
               placeholder="Madhya Pradesh"
+              className="rounded-xl"
             />
           </Field>
           <Field label={t('districtLabel')} htmlFor="district">
@@ -144,14 +146,15 @@ export default function Market() {
               value={district}
               onChange={(event) => setDistrict(event.target.value)}
               placeholder="Indore"
+              className="rounded-xl"
             />
           </Field>
           <div className="flex items-end gap-2">
-            <Button type="submit" variant="primary" className="flex-1">
-              <SearchIcon size={14} />
+            <Button type="submit" variant="primary" className="flex-1 rounded-xl py-2 font-semibold">
+              <SearchIcon size={15} />
               {t('search')}
             </Button>
-            <Button type="button" variant="ghost" onClick={handleClear}>
+            <Button type="button" variant="ghost" onClick={handleClear} className="rounded-xl">
               {t('clear')}
             </Button>
           </div>
@@ -165,7 +168,7 @@ export default function Market() {
           {nearby.length === 0 ? (
             <EmptyState title={t('noResults')} />
           ) : (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {nearby.map((price) => (
                 <PriceCard
                   key={`nearby-${price.id}`}
@@ -186,7 +189,7 @@ export default function Market() {
       ) : prices.length === 0 ? (
         <EmptyState title={t('noResults')} action={<Button onClick={handleClear}>{t('clear')}</Button>} />
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {prices.map((price) => (
             <PriceCard
               key={price.id}
@@ -213,18 +216,18 @@ export default function Market() {
         ) : (
           <div className="space-y-4">
             {trend.map((row) => (
-              <div key={row.id}>
-                <div className="mb-1 flex items-baseline justify-between gap-3 text-sm">
-                  <span className="truncate text-ink">
+              <div key={row.id} className="rounded-xl bg-creamSoft/60 p-3.5 border border-leaf/20">
+                <div className="mb-1.5 flex items-baseline justify-between gap-3 text-sm">
+                  <span className="truncate font-semibold text-ink">
                     {row.mandi_name}
-                    <span className="text-muted"> · {row.district}</span>
+                    <span className="text-xs font-normal text-muted"> · {row.district}</span>
                   </span>
-                  <span className="shrink-0 font-semibold text-brand-text">
+                  <span className="shrink-0 text-base font-bold text-forest">
                     {money(row.modal_price)}
                   </span>
                 </div>
                 <Meter value={trendMax ? (row.modal_price / trendMax) * 100 : 0} />
-                <p className="mt-1 text-xs text-muted">
+                <p className="mt-1.5 text-[11px] text-muted">
                   {t('recordedOn', { date: shortDate(row.recorded_on) })}
                 </p>
               </div>
@@ -251,33 +254,45 @@ function PriceCard({
 }) {
   const hasRange = price.min_price !== null && price.max_price !== null
   return (
-    <Card interactive className="flex flex-col p-4">
-      <div className="mb-3 flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <h3 className="truncate text-sm font-semibold text-ink">{price.commodity}</h3>
-          <p className="mt-0.5 truncate text-xs text-muted">
-            {mandiLabel}: {price.mandi_name}
-          </p>
-          <p className="truncate text-xs text-muted">
-            {price.district}, {price.state}
-          </p>
+    <Card interactive className="group flex flex-col p-5 rounded-2xl border border-leaf/30 bg-white/95 shadow-card transition-all duration-200 hover:-translate-y-1 hover:shadow-lift hover:border-leaf/70">
+      <div className="mb-3.5 flex items-start justify-between gap-2.5">
+        <div className="flex items-center gap-3 min-w-0">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-sageSoft to-leafSoft text-forest text-base shadow-2xs ring-1 ring-leaf/30 transition-transform group-hover:scale-105">
+            🌾
+          </span>
+          <div className="min-w-0">
+            <h3 className="truncate text-base font-bold text-ink group-hover:text-forest transition-colors">
+              {price.commodity}
+            </h3>
+            <p className="truncate text-xs text-muted">
+              {mandiLabel}: {price.mandi_name} · {price.district}
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="mb-3">
-        <p className="text-xl font-semibold tabular-nums text-brand-text">
-          {money(price.modal_price)}
-        </p>
-        <p className="text-xs text-muted">{perQuintal}</p>
+      <div className="my-2 rounded-xl bg-creamSoft/70 p-3 border border-leaf/15">
+        <div className="flex items-baseline justify-between">
+          <p className="text-2xl font-extrabold tabular-nums text-forest">
+            {money(price.modal_price)}
+          </p>
+          <span className="text-xs font-semibold text-forest/70">{perQuintal}</span>
+        </div>
         {hasRange && (
-          <p className="mt-1 text-xs text-muted">
-            {money(price.min_price)} – {money(price.max_price)}
+          <p className="mt-1 text-[11px] font-medium text-muted">
+            Range: {money(price.min_price)} – {money(price.max_price)}
           </p>
         )}
       </div>
 
-      <Button size="sm" className="mt-auto w-full" onClick={onTrend}>
-        {trendLabel}
+      <Button
+        size="sm"
+        variant="secondary"
+        className="mt-auto w-full rounded-xl font-semibold border-leaf/40 hover:border-forest"
+        onClick={onTrend}
+      >
+        <span>{trendLabel}</span>
+        <span className="ml-1 transition-transform group-hover:translate-x-0.5">→</span>
       </Button>
     </Card>
   )

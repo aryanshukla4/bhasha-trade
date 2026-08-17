@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { ChatIcon, MicIcon, SendIcon, SpeakerIcon } from '../components/icons'
+import { LeafIcon, MicIcon, SendIcon, SpeakerIcon } from '../components/icons'
 import {
   Badge,
   Button,
   Card,
   InfoNote,
-  PageHeader,
   Spinner,
   cx,
   useToast,
@@ -195,30 +194,53 @@ export default function Chat() {
   const suggestions = [t('chatSuggestion1'), t('chatSuggestion2'), t('chatSuggestion3')]
 
   return (
-    <div className="flex h-[calc(100vh-13rem)] min-h-[30rem] flex-col lg:h-[calc(100vh-11rem)]">
-      <PageHeader title={t('chatTitle')} subtitle={t('chatSubtitle')} />
+    <div className="flex h-[calc(100vh-13rem)] min-h-[32rem] flex-col lg:h-[calc(100vh-11rem)]">
+      {/* Header bar with status indicator */}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">
+              {t('chatTitle')}
+            </h1>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-leafSoft px-2.5 py-0.5 text-xs font-semibold text-forest border border-leaf/40">
+              <span className="h-2 w-2 rounded-full bg-forest animate-pulse" />
+              Bhasha AI
+            </span>
+          </div>
+          <p className="mt-1 text-sm text-muted">{t('chatSubtitle')}</p>
+        </div>
+      </div>
 
-      <Card className="flex min-h-0 flex-1 flex-col">
-        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
+      <Card className="flex min-h-0 flex-1 flex-col overflow-hidden border border-leaf/30 shadow-card bg-cream/40 backdrop-blur-xs">
+        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4 sm:p-5">
           {loadingHistory ? (
-            <div className="flex justify-center py-10">
-              <Spinner className="text-muted" />
+            <div className="flex justify-center py-16">
+              <Spinner className="text-forest" size={24} />
             </div>
           ) : messages.length === 0 ? (
-            <div className="flex h-full flex-col items-center justify-center px-4 text-center">
-              <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-brand-soft text-brand">
-                <ChatIcon size={22} />
-              </span>
-              <p className="mb-5 max-w-sm text-sm text-muted">{t('chatEmpty')}</p>
-              <div className="flex flex-wrap justify-center gap-2">
+            <div className="flex h-full flex-col items-center justify-center px-4 py-8 text-center">
+              <div className="relative mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-sageSoft to-leafSoft text-forest shadow-xs ring-4 ring-leaf/20">
+                <LeafIcon size={30} />
+                <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-forest text-cream text-[10px]">
+                  ✨
+                </span>
+              </div>
+              <h2 className="text-lg font-bold text-ink">
+                How can I help with your farming today?
+              </h2>
+              <p className="mb-6 mt-1 max-w-md text-xs sm:text-sm text-muted leading-relaxed">
+                {t('chatEmpty')}
+              </p>
+              <div className="flex flex-wrap justify-center gap-2.5 max-w-xl">
                 {suggestions.map((suggestion) => (
                   <button
                     key={suggestion}
                     type="button"
                     onClick={() => void send(suggestion)}
-                    className="rounded-full border border-line px-3 py-1.5 text-xs text-ink transition-colors hover:border-brand hover:bg-brand-soft"
+                    className="group flex items-center gap-2 rounded-2xl border border-leaf/30 bg-white/90 px-3.5 py-2 text-xs font-medium text-forest shadow-2xs transition-all duration-150 hover:-translate-y-0.5 hover:border-forest hover:bg-creamSoft hover:shadow-xs"
                   >
-                    {suggestion}
+                    <span className="text-muted group-hover:text-forest">🌱</span>
+                    <span>{suggestion}</span>
                   </button>
                 ))}
               </div>
@@ -233,12 +255,18 @@ export default function Chat() {
                 )}
               >
                 <div className={cx('max-w-[85%] sm:max-w-[75%]')}>
+                  {message.role === 'assistant' && (
+                    <div className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold text-forest">
+                      <span>🌱</span>
+                      <span>Bhasha AI</span>
+                    </div>
+                  )}
                   <div
                     className={cx(
-                      'rounded-lg px-3.5 py-2.5 text-sm',
+                      'rounded-2xl px-4.5 py-3 text-sm shadow-sm leading-relaxed',
                       message.role === 'user'
-                        ? 'bg-brand text-white'
-                        : 'border border-line bg-surface text-ink',
+                        ? 'rounded-tr-xs bg-gradient-to-r from-forest to-[#0c590e] text-cream'
+                        : 'rounded-tl-xs border border-leaf/40 bg-white/95 text-ink',
                     )}
                   >
                     <p className="whitespace-pre-wrap break-words">
@@ -258,8 +286,8 @@ export default function Chat() {
                         type="button"
                         onClick={() => void readAloud(message)}
                         className={cx(
-                          'rounded p-1 transition-colors hover:bg-surface',
-                          speakingId === message.id ? 'text-brand' : 'text-muted',
+                          'inline-flex items-center gap-1 rounded-lg px-2 py-0.5 text-xs font-medium transition-colors hover:bg-leafSoft',
+                          speakingId === message.id ? 'bg-leafSoft text-forest font-bold' : 'text-muted hover:text-forest',
                         )}
                         aria-label={
                           speakingId === message.id ? t('chatStopSpeaking') : t('chatSpeak')
@@ -268,16 +296,17 @@ export default function Chat() {
                           speakingId === message.id ? t('chatStopSpeaking') : t('chatSpeak')
                         }
                       >
-                        <SpeakerIcon size={14} />
+                        <SpeakerIcon size={13} />
+                        <span className="text-[10px]">{speakingId === message.id ? 'Playing' : 'Listen'}</span>
                       </button>
                     )}
                   </div>
 
                   {message.sources && message.sources.length > 0 && (
                     <div className="mt-1.5 flex flex-wrap gap-1.5">
-                      <span className="text-[11px] text-muted">{t('chatSources')}:</span>
+                      <span className="text-[11px] font-medium text-muted">{t('chatSources')}:</span>
                       {message.sources.map((source) => (
-                        <Badge key={source} tone="green" className="text-[11px]">
+                        <Badge key={source} tone="green" className="text-[10px]">
                           {source}
                         </Badge>
                       ))}
@@ -290,9 +319,9 @@ export default function Chat() {
 
           {sending && (
             <div className="flex justify-start">
-              <div className="flex items-center gap-2 rounded-lg border border-line bg-surface px-3.5 py-2.5">
-                <Spinner size={14} className="text-muted" />
-                <span className="text-sm text-muted">{t('loading')}</span>
+              <div className="flex items-center gap-2.5 rounded-2xl border border-leaf/40 bg-white/90 px-4 py-3 shadow-xs">
+                <Spinner size={15} className="text-forest" />
+                <span className="text-xs font-medium text-forest">Bhasha AI is thinking…</span>
               </div>
             </div>
           )}
@@ -302,13 +331,14 @@ export default function Chat() {
 
         {listening && (
           <div className="px-4">
-            <InfoNote tone="green" className="mb-2">
-              {t('chatListening')}
+            <InfoNote tone="green" className="mb-2 flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-forest animate-ping" />
+              <span>{t('chatListening')}</span>
             </InfoNote>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="flex gap-2 border-t border-line p-3">
+        <form onSubmit={handleSubmit} className="flex gap-2.5 border-t border-line/70 bg-white/80 p-3.5 backdrop-blur-sm">
           <Button
             type="button"
             onClick={toggleMic}
@@ -316,19 +346,28 @@ export default function Chat() {
             aria-label={listening ? t('chatMicStop') : t('chatMicStart')}
             title={micSupported ? t('chatMicStart') : t('chatMicUnsupported')}
             disabled={!micSupported}
+            className={cx(
+              'shrink-0 h-10 w-10 !p-0 rounded-xl transition-all',
+              listening && 'ring-4 ring-forest/30',
+            )}
           >
-            <MicIcon size={16} />
+            <MicIcon size={17} />
           </Button>
           <input
             value={input}
             onChange={(event) => setInput(event.target.value)}
             placeholder={t('chatPlaceholder')}
-            className="field-base flex-1"
+            className="field-base flex-1 rounded-xl bg-white focus:bg-white"
             aria-label={t('chatPlaceholder')}
           />
-          <Button type="submit" variant="primary" disabled={!input.trim() || sending}>
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={!input.trim() || sending}
+            className="shrink-0 rounded-xl px-4 py-2 font-semibold shadow-xs"
+          >
             <SendIcon size={16} />
-            <span className="hidden sm:inline">{t('chatSend')}</span>
+            <span className="hidden sm:inline ml-1">{t('chatSend')}</span>
           </Button>
         </form>
       </Card>

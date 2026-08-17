@@ -24,18 +24,18 @@ type ButtonSize = 'sm' | 'md'
 
 const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
   primary:
-    'bg-brand text-white border border-brand hover:bg-brand-hover hover:border-brand-hover disabled:bg-brand/40 disabled:border-brand/40',
+    'bg-gradient-to-r from-forest to-[#0c590e] text-cream border border-forest shadow-xs hover:from-forestHover hover:to-[#0f6815] hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed',
   secondary:
-    'bg-white text-ink border border-line hover:bg-surface disabled:text-muted disabled:hover:bg-white',
+    'bg-white text-forest border border-leaf/50 font-medium hover:bg-sageSoft/40 hover:border-leaf hover:shadow-xs active:scale-[0.98] disabled:text-muted disabled:hover:bg-white',
   ghost:
-    'bg-transparent text-muted border border-transparent hover:bg-surface hover:text-ink',
+    'bg-transparent text-forest/80 border border-transparent hover:bg-leafSoft hover:text-forest active:scale-[0.98] disabled:text-muted',
   danger:
-    'bg-white text-danger border border-danger/30 hover:bg-danger-soft disabled:text-danger/40',
+    'bg-white text-danger border border-danger/30 hover:bg-danger-soft disabled:text-danger/40 active:scale-[0.98]',
 }
 
 const BUTTON_SIZES: Record<ButtonSize, string> = {
-  sm: 'px-2.5 py-1.5 text-xs gap-1.5',
-  md: 'px-3.5 py-2 text-sm gap-2',
+  sm: 'px-3 py-1.5 text-xs gap-1.5 rounded-lg',
+  md: 'px-4 py-2 text-sm gap-2 rounded-xl',
 }
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -60,7 +60,7 @@ export function Button({
       {...rest}
       disabled={disabled || loading}
       className={cx(
-        'inline-flex items-center justify-center rounded-md font-medium transition-colors',
+        'inline-flex items-center justify-center font-medium transition-all duration-150',
         'disabled:cursor-not-allowed',
         BUTTON_VARIANTS[variant],
         BUTTON_SIZES[size],
@@ -99,8 +99,8 @@ export function Spinner({ size = 16, className }: { size?: number; className?: s
 
 export function LoadingBlock({ label }: { label: string }) {
   return (
-    <div className="flex items-center justify-center gap-2 py-12 text-sm text-muted">
-      <Spinner />
+    <div className="flex items-center justify-center gap-2.5 py-12 text-sm font-medium text-muted">
+      <Spinner className="text-forest" />
       {label}
     </div>
   )
@@ -120,8 +120,8 @@ export function Card({
   return (
     <div
       className={cx(
-        'rounded-lg border border-line bg-white shadow-card',
-        interactive && 'transition-shadow hover:shadow-lift',
+        'rounded-2xl border border-leaf/30 bg-white/95 shadow-card transition-all duration-200',
+        interactive && 'hover:-translate-y-0.5 hover:shadow-lift hover:border-leaf/60',
         className,
       )}
     >
@@ -140,7 +140,7 @@ export function CardHeader({
   action?: ReactNode
 }) {
   return (
-    <div className="flex items-start justify-between gap-3 border-b border-line px-4 py-3">
+    <div className="flex items-start justify-between gap-3 border-b border-line/70 px-5 py-3.5">
       <div className="min-w-0">
         <h2 className="truncate text-sm font-semibold text-ink">{title}</h2>
         {subtitle && <p className="mt-0.5 text-xs text-muted">{subtitle}</p>}
@@ -162,9 +162,9 @@ export function PageHeader({
   action?: ReactNode
 }) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+    <div className="mb-7 flex flex-wrap items-end justify-between gap-3">
       <div>
-        <h1 className="text-xl font-semibold tracking-tight text-ink sm:text-2xl">{title}</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">{title}</h1>
         {subtitle && <p className="mt-1 text-sm text-muted">{subtitle}</p>}
       </div>
       {action}
@@ -250,11 +250,11 @@ export function Select({
 type Tone = 'neutral' | 'green' | 'amber' | 'blue' | 'red'
 
 const TONES: Record<Tone, string> = {
-  neutral: 'bg-surface text-muted border-line',
-  green: 'bg-brand-soft text-brand-text border-brand-border',
-  amber: 'bg-warn-soft text-warn border-warn-border',
-  blue: 'bg-info-soft text-info border-info-border',
-  red: 'bg-danger-soft text-danger border-danger-border',
+  neutral: 'bg-surface/80 text-muted border-line',
+  green: 'bg-leafSoft text-forest border-leaf/60 font-semibold',
+  amber: 'bg-goldSoft text-soil border-gold/40 font-semibold',
+  blue: 'bg-info-soft text-info border-info-border font-semibold',
+  red: 'bg-danger-soft text-danger border-danger-border font-semibold',
 }
 
 export function Badge({
@@ -269,7 +269,7 @@ export function Badge({
   return (
     <span
       className={cx(
-        'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium',
+        'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium shadow-2xs',
         TONES[tone],
         className,
       )}
@@ -312,11 +312,17 @@ export function EmptyState({
   icon?: ReactNode
 }) {
   return (
-    <div className="rounded-lg border border-dashed border-line bg-surface/60 px-6 py-12 text-center">
-      {icon && <div className="mb-3 flex justify-center text-muted">{icon}</div>}
-      <p className="text-sm font-medium text-ink">{title}</p>
-      {description && <p className="mx-auto mt-1 max-w-md text-sm text-muted">{description}</p>}
-      {action && <div className="mt-4 flex justify-center">{action}</div>}
+    <div className="rounded-2xl border border-dashed border-leaf/40 bg-creamSoft/70 px-6 py-12 text-center">
+      {icon && (
+        <div className="mb-3.5 flex justify-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-sageSoft/70 text-forest shadow-xs">
+            {icon}
+          </span>
+        </div>
+      )}
+      <p className="text-base font-semibold text-forest">{title}</p>
+      {description && <p className="mx-auto mt-1.5 max-w-md text-sm text-muted">{description}</p>}
+      {action && <div className="mt-5 flex justify-center">{action}</div>}
     </div>
   )
 }
@@ -326,7 +332,7 @@ export function ErrorNote({ message, className }: { message: string; className?:
     <div
       role="alert"
       className={cx(
-        'rounded-md border border-danger-border bg-danger-soft px-3 py-2 text-sm text-danger',
+        'rounded-xl border border-danger-border bg-danger-soft px-4 py-3 text-sm text-danger shadow-xs',
         className,
       )}
     >
@@ -346,12 +352,14 @@ export function InfoNote({
 }) {
   const style =
     tone === 'amber'
-      ? 'border-warn-border bg-warn-soft text-warn'
+      ? 'border-gold/40 bg-goldSoft text-soil'
       : tone === 'green'
-        ? 'border-brand-border bg-brand-soft text-brand-text'
-        : 'border-info-border bg-info-soft text-info'
+        ? 'border-leaf/60 bg-sageSoft/60 text-forest'
+        : tone === 'blue'
+          ? 'border-info-border bg-info-soft text-info'
+          : 'border-leaf/30 bg-creamSoft text-ink'
   return (
-    <div className={cx('rounded-md border px-3 py-2 text-sm', style, className)}>{children}</div>
+    <div className={cx('rounded-xl border px-4 py-3 text-sm shadow-xs', style, className)}>{children}</div>
   )
 }
 
@@ -402,9 +410,9 @@ export function Modal({
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-4">
+    <div className="fixed inset-0 z-50 flex items-end justify-center p-0 backdrop-blur-xs sm:items-center sm:p-4">
       <div
-        className="absolute inset-0 bg-ink/30"
+        className="absolute inset-0 bg-ink/40 transition-opacity"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -415,31 +423,31 @@ export function Modal({
         aria-label={title}
         tabIndex={-1}
         className={cx(
-          'relative flex max-h-[92vh] w-full flex-col rounded-t-xl bg-white shadow-modal sm:rounded-xl',
+          'relative flex max-h-[92vh] w-full flex-col rounded-t-2xl bg-white shadow-modal sm:rounded-2xl border border-leaf/30 overflow-hidden',
           wide ? 'sm:max-w-2xl' : 'sm:max-w-md',
         )}
       >
-        <div className="flex items-center justify-between border-b border-line px-4 py-3">
-          <h2 className="text-sm font-semibold text-ink">{title}</h2>
+        <div className="flex items-center justify-between border-b border-line/70 bg-creamSoft/40 px-5 py-4">
+          <h2 className="text-base font-semibold text-ink">{title}</h2>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md p-1 text-muted transition-colors hover:bg-surface hover:text-ink"
+            className="rounded-lg p-1.5 text-muted transition-colors hover:bg-creamSoft hover:text-forest"
             aria-label="Close"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path
                 d="M4 4l8 8M12 4l-8 8"
                 stroke="currentColor"
-                strokeWidth="1.6"
+                strokeWidth="1.8"
                 strokeLinecap="round"
               />
             </svg>
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto px-4 py-4">{children}</div>
+        <div className="flex-1 overflow-y-auto px-5 py-5">{children}</div>
         {footer && (
-          <div className="flex justify-end gap-2 border-t border-line px-4 py-3">{footer}</div>
+          <div className="flex justify-end gap-2.5 border-t border-line/70 bg-creamSoft/30 px-5 py-3.5">{footer}</div>
         )}
       </div>
     </div>
@@ -471,7 +479,7 @@ export function Tabs<T extends string>({
             className={cx(
               '-mb-px whitespace-nowrap border-b-2 px-3 py-2 text-sm font-medium transition-colors',
               selected
-                ? 'border-brand text-brand-text'
+                ? 'border-forest text-forest font-semibold'
                 : 'border-transparent text-muted hover:border-line hover:text-ink',
             )}
           >
@@ -480,7 +488,7 @@ export function Tabs<T extends string>({
               <span
                 className={cx(
                   'ml-1.5 rounded-full px-1.5 py-0.5 text-xs',
-                  selected ? 'bg-brand-soft text-brand-text' : 'bg-surface text-muted',
+                  selected ? 'bg-sageSoft text-forest' : 'bg-surface text-muted',
                 )}
               >
                 {tab.count}
@@ -508,7 +516,7 @@ export function Meter({
   valueLabel?: string
 }) {
   const fill = {
-    green: 'bg-brand',
+    green: 'bg-forest',
     amber: 'bg-warn',
     red: 'bg-danger',
     blue: 'bg-info',
@@ -625,7 +633,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             className={cx(
               'pointer-events-auto w-full max-w-sm rounded-md border px-3 py-2 text-sm shadow-lift',
               toast.tone === 'success'
-                ? 'border-brand-border bg-brand-soft text-brand-text'
+                ? 'border-leaf bg-sageSoft text-forest'
                 : 'border-danger-border bg-danger-soft text-danger',
             )}
           >

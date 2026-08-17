@@ -130,68 +130,80 @@ export default function ProduceDetail() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <Card className="overflow-hidden">
-            {listing.photo_url && (
+          <Card className="overflow-hidden rounded-2xl border border-leaf/30 bg-white/95 shadow-card">
+            {listing.photo_url ? (
               <img
                 src={listing.photo_url}
                 alt={listing.crop_type}
-                className="h-56 w-full border-b border-line object-cover sm:h-72"
+                className="h-64 w-full border-b border-leaf/20 object-cover sm:h-80"
                 onError={(event) => {
                   event.currentTarget.style.display = 'none'
                 }}
               />
+            ) : (
+              <div className="flex h-48 w-full items-center justify-center bg-gradient-to-br from-sageSoft/70 to-leafSoft/50 text-forest border-b border-leaf/20">
+                <span className="text-5xl">🌾</span>
+              </div>
             )}
-            <div className="p-5">
-              <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
-                <h1 className="text-xl font-semibold tracking-tight text-ink">
-                  {listing.crop_type}
-                </h1>
+            <div className="p-6">
+              <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h1 className="text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">
+                    {listing.crop_type}
+                  </h1>
+                  {(listing.district || listing.state) && (
+                    <p className="mt-1 flex items-center gap-1 text-xs text-muted">
+                      <span>📍</span>
+                      <span>{[listing.district, listing.state].filter(Boolean).join(', ')}</span>
+                    </p>
+                  )}
+                </div>
                 <StatusBadge status={listing.status} label={statusLabel(listing.status, t)} />
               </div>
 
-              <p className="text-2xl font-semibold tabular-nums text-brand-text">
-                {money(listing.price_per_unit)}
-                <span className="ml-1.5 text-sm font-normal text-muted">/ {listing.unit}</span>
-              </p>
-              <p className="mt-1 text-sm text-muted">
-                {t('availableQty', {
-                  qty: number(listing.quantity),
-                  unit: listing.unit,
-                })}
-              </p>
+              <div className="my-4 rounded-2xl bg-creamSoft/70 p-4 border border-leaf/20">
+                <div className="flex items-baseline justify-between">
+                  <p className="text-3xl font-extrabold tabular-nums text-forest">
+                    {money(listing.price_per_unit)}
+                    <span className="ml-1.5 text-sm font-semibold text-forest/70">/ {listing.unit}</span>
+                  </p>
+                  <span className="text-sm font-medium text-muted">
+                    {t('availableQty', {
+                      qty: number(listing.quantity),
+                      unit: listing.unit,
+                    })}
+                  </span>
+                </div>
+              </div>
 
               {listing.description && (
-                <div className="mt-5 border-t border-line pt-4">
-                  <h2 className="mb-1.5 text-sm font-medium text-ink">
+                <div className="mt-6 border-t border-line/60 pt-4">
+                  <h2 className="mb-1.5 text-sm font-bold text-ink">
                     {t('descriptionLabel')}
                   </h2>
-                  <p className="whitespace-pre-wrap text-sm text-muted">
+                  <p className="whitespace-pre-wrap text-sm text-ink/80 leading-relaxed">
                     {listing.description}
                   </p>
                 </div>
               )}
 
-              <dl className="mt-5 grid gap-3 border-t border-line pt-4 text-sm sm:grid-cols-2">
-                {(listing.district || listing.state) && (
-                  <div>
-                    <dt className="text-xs text-muted">{t('locationLabel')}</dt>
-                    <dd className="mt-0.5 text-ink">
-                      {[listing.district, listing.state].filter(Boolean).join(', ')}
-                    </dd>
-                  </div>
-                )}
+              <dl className="mt-6 grid gap-3 border-t border-line/60 pt-4 text-sm sm:grid-cols-2">
                 <div>
                   <dt className="text-xs text-muted">{t('listedOn', { date: '' }).trim()}</dt>
-                  <dd className="mt-0.5 text-ink">{shortDate(listing.created_at)}</dd>
+                  <dd className="mt-0.5 font-medium text-ink">{shortDate(listing.created_at)}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-muted">Listing ID</dt>
+                  <dd className="mt-0.5 font-mono text-xs text-muted">{listing.id.slice(0, 8)}</dd>
                 </div>
               </dl>
 
-              <div className="mt-6 border-t border-line pt-4">
+              <div className="mt-6 border-t border-line/60 pt-5">
                 {isOwn ? (
-                  <InfoNote>{t('ownListingNote')}</InfoNote>
+                  <InfoNote tone="blue">{t('ownListingNote')}</InfoNote>
                 ) : canBuy ? (
-                  <Button variant="primary" onClick={() => setOfferOpen(true)}>
-                    {t('expressInterest')}
+                  <Button variant="primary" size="md" className="rounded-xl px-6 py-2.5 font-semibold shadow-xs" onClick={() => setOfferOpen(true)}>
+                    🤝 {t('expressInterest')}
                   </Button>
                 ) : (
                   <InfoNote tone="amber">{t('noResults')}</InfoNote>
@@ -207,7 +219,7 @@ export default function ProduceDetail() {
             <div className="space-y-3 p-4">
               {verification && (
                 <div className="flex items-center gap-2 text-sm">
-                  <CheckIcon size={15} className="text-brand" />
+                  <CheckIcon size={15} className="text-forest" />
                   <span className="text-ink">
                     {verification.verificationStatus === 'phone_verified'
                       ? t('statusPhoneVerified')

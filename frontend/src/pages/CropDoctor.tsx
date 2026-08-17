@@ -112,8 +112,8 @@ export default function CropDoctor() {
       <PageHeader title={t('cropTitle')} subtitle={t('cropSubtitle')} />
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="space-y-5">
-          <Card className="p-4">
+        <div className="space-y-6">
+          <Card className="p-6 rounded-2xl border border-leaf/30 bg-white/95 shadow-card">
             <div
               onDragOver={(event) => {
                 event.preventDefault()
@@ -128,22 +128,25 @@ export default function CropDoctor() {
                 if (event.key === 'Enter' || event.key === ' ') fileInputRef.current?.click()
               }}
               className={cx(
-                'flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 text-center transition-colors',
-                dragging ? 'border-brand bg-brand-soft' : 'border-line hover:border-brand',
+                'group flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 text-center transition-all duration-200',
+                dragging
+                  ? 'border-forest bg-sageSoft/50 ring-4 ring-leaf/30'
+                  : 'border-leaf/50 bg-creamSoft/60 hover:border-forest hover:bg-creamSoft',
               )}
             >
               {preview ? (
                 <img
                   src={preview}
-                  alt=""
-                  className="max-h-64 w-auto rounded-md object-contain"
+                  alt="Crop sample"
+                  className="max-h-64 w-auto rounded-xl object-contain shadow-xs border border-leaf/30"
                 />
               ) : (
                 <>
-                  <span className="mb-2 flex h-11 w-11 items-center justify-center rounded-full bg-brand-soft text-brand">
-                    <LeafIcon size={22} />
+                  <span className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-sageSoft to-leafSoft text-forest shadow-xs ring-1 ring-leaf/30 transition-transform group-hover:scale-110">
+                    <LeafIcon size={28} />
                   </span>
-                  <p className="text-sm text-muted">{t('cropDrop')}</p>
+                  <p className="text-sm font-semibold text-ink">{t('cropDrop')}</p>
+                  <p className="mt-1 text-xs text-muted">Supports JPG, PNG, WEBP from farm camera or gallery</p>
                 </>
               )}
             </div>
@@ -164,46 +167,48 @@ export default function CropDoctor() {
               className="hidden"
             />
 
-            <div className="mt-4 flex flex-wrap gap-2">
-              <Button onClick={() => fileInputRef.current?.click()}>
+            <div className="mt-5 flex flex-wrap items-center gap-2.5">
+              <Button onClick={() => fileInputRef.current?.click()} className="rounded-xl font-medium">
                 {t('cropChoose')}
               </Button>
-              <Button onClick={() => cameraInputRef.current?.click()}>
+              <Button onClick={() => cameraInputRef.current?.click()} className="rounded-xl font-medium">
                 <CameraIcon size={15} />
-                {t('cropTakePhoto')}
+                <span className="ml-1">{t('cropTakePhoto')}</span>
               </Button>
               <Button
                 variant="primary"
-                className="ml-auto"
+                className="ml-auto rounded-xl px-5 font-semibold shadow-xs"
                 disabled={!file}
                 loading={busy}
                 onClick={() => void analyse()}
               >
-                {t('cropAnalyse')}
+                🔬 {t('cropAnalyse')}
               </Button>
               {file && (
-                <Button variant="ghost" onClick={reset}>
+                <Button variant="ghost" onClick={reset} className="rounded-xl">
                   {t('cropAnother')}
                 </Button>
               )}
             </div>
           </Card>
 
-          <Card>
+          <Card className="rounded-2xl border border-leaf/30 bg-white/95 shadow-card p-5">
             <CardHeader title={t('cropTipsTitle')} />
-            <ul className="space-y-2 p-4 text-sm text-muted">
+            <ul className="mt-2 space-y-2.5 text-xs text-muted">
               {[t('cropTip1'), t('cropTip2'), t('cropTip3')].map((tip) => (
-                <li key={tip} className="flex items-start gap-2">
-                  <CheckIcon size={15} className="mt-0.5 shrink-0 text-brand" />
-                  {tip}
+                <li key={tip} className="flex items-start gap-2.5">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-sageSoft text-forest">
+                    <CheckIcon size={12} />
+                  </span>
+                  <span className="leading-tight text-ink/80">{tip}</span>
                 </li>
               ))}
             </ul>
           </Card>
 
-          <Card>
+          <Card className="rounded-2xl border border-leaf/30 bg-white/95 shadow-card p-5">
             <CardHeader title={t('cropAdvisoryTitle')} />
-            <div className="space-y-3 p-4">
+            <div className="mt-3 space-y-3">
               <div className="flex items-end gap-2">
                 <div className="flex-1">
                   <Field label={t('cropTypeLabel')} htmlFor="advisoryCrop">
@@ -211,7 +216,8 @@ export default function CropDoctor() {
                       id="advisoryCrop"
                       value={advisoryCrop}
                       onChange={(event) => setAdvisoryCrop(event.target.value)}
-                      placeholder="Tomato"
+                      placeholder="e.g. Tomato, Cotton, Wheat"
+                      className="rounded-xl"
                     />
                   </Field>
                 </div>
@@ -219,18 +225,19 @@ export default function CropDoctor() {
                   onClick={() => void loadAdvisory()}
                   loading={advisoryBusy}
                   disabled={!advisoryCrop.trim()}
+                  className="rounded-xl"
                 >
                   <SearchIcon size={14} />
                 </Button>
               </div>
 
               {advisory && (
-                <div className="rounded-md border border-line bg-surface p-3">
-                  <p className="mb-1 text-sm font-medium text-ink">
+                <div className="rounded-xl border border-leaf/30 bg-creamSoft/70 p-3.5">
+                  <p className="mb-1 text-sm font-bold text-forest">
                     {t('cropAdvisoryFor', { crop: advisory.cropType })}
                   </p>
-                  <p className="text-sm text-muted">{advisory.advisory}</p>
-                  <p className="mt-2 text-xs text-muted">
+                  <p className="text-xs text-ink/90 leading-relaxed">{advisory.advisory}</p>
+                  <p className="mt-2 text-[11px] font-medium text-muted">
                     {t('cropSource')}: {advisory.source}
                   </p>
                 </div>
@@ -239,41 +246,41 @@ export default function CropDoctor() {
           </Card>
         </div>
 
-        <div className="space-y-5">
+        <div className="space-y-6">
           {busy && (
-            <Card className="flex items-center justify-center gap-2 p-10 text-sm text-muted">
-              <Spinner />
-              {t('cropAnalysing')}
+            <Card className="flex flex-col items-center justify-center gap-3 p-12 text-sm text-muted rounded-2xl border border-leaf/30 bg-white/95 shadow-card">
+              <Spinner size={24} className="text-forest" />
+              <span className="font-semibold text-forest">{t('cropAnalysing')}</span>
             </Card>
           )}
 
           {unavailable && (
-            <Card className="p-5">
-              <div className="mb-2 flex items-center gap-2 text-warn">
+            <Card className="p-6 rounded-2xl border border-gold/40 bg-goldSoft/30 shadow-card">
+              <div className="mb-2 flex items-center gap-2 text-soil font-bold">
                 <AlertIcon size={18} />
-                <h2 className="text-sm font-semibold">{t('cropUnavailable')}</h2>
+                <h2 className="text-sm font-bold">{t('cropUnavailable')}</h2>
               </div>
-              <p className="text-sm text-muted">{t('cropUnavailableHint')}</p>
+              <p className="text-xs text-soil/80 leading-relaxed">{t('cropUnavailableHint')}</p>
             </Card>
           )}
 
           {error && <ErrorNote message={error} />}
 
           {result?.status === 'quality_rejected' && (
-            <Card className="p-5">
-              <div className="mb-3 flex items-center gap-2 text-warn">
+            <Card className="p-6 rounded-2xl border border-danger/30 bg-white/95 shadow-card">
+              <div className="mb-3 flex items-center gap-2 text-danger">
                 <AlertIcon size={18} />
-                <h2 className="text-sm font-semibold">{t('cropQualityRejected')}</h2>
+                <h2 className="text-sm font-bold">{t('cropQualityRejected')}</h2>
               </div>
-              <p className="mb-4 text-sm text-muted">{result.message}</p>
+              <p className="mb-4 text-xs text-muted leading-relaxed">{result.message}</p>
 
               <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">
                 {t('cropQualityIssues')}
               </h3>
               <ul className="mb-4 space-y-1.5">
                 {result.issues.map((issue) => (
-                  <li key={issue} className="flex items-start gap-2 text-sm text-ink">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-warn" />
+                  <li key={issue} className="flex items-start gap-2 text-xs text-ink font-medium">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-danger" />
                     {issue}
                   </li>
                 ))}
@@ -281,7 +288,7 @@ export default function CropDoctor() {
 
               <QualityMetrics metrics={result.metrics} t={t} />
 
-              <Button className="mt-4" onClick={reset}>
+              <Button className="mt-5 rounded-xl font-semibold" onClick={reset}>
                 {t('cropAnother')}
               </Button>
             </Card>
@@ -289,8 +296,8 @@ export default function CropDoctor() {
 
           {result?.status === 'ok' && (
             <>
-              <Card className="p-5">
-                <h2 className="mb-3 text-sm font-semibold text-ink">{t('cropResult')}</h2>
+              <Card className="p-6 rounded-2xl border border-leaf/30 bg-white/95 shadow-card">
+                <h2 className="mb-3 text-sm font-bold uppercase tracking-wider text-forest">{t('cropResult')}</h2>
                 <RecommendationPanel
                   prediction={result.final_recommendation}
                   t={t}
@@ -299,9 +306,9 @@ export default function CropDoctor() {
               </Card>
 
               {result.fallback_triggered && (
-                <Card className="p-5">
+                <Card className="p-6 rounded-2xl border border-gold/40 bg-white/95 shadow-card">
                   <div className="mb-3 flex items-center gap-2">
-                    <h2 className="text-sm font-semibold text-ink">
+                    <h2 className="text-sm font-bold text-ink">
                       {t('cropSecondOpinion')}
                     </h2>
                     <Badge tone="amber">{t('cropConfidence')}</Badge>
@@ -318,23 +325,24 @@ export default function CropDoctor() {
                 </Card>
               )}
 
-              <Card className="p-5">
-                <h2 className="mb-3 text-sm font-semibold text-ink">
+              <Card className="p-6 rounded-2xl border border-leaf/30 bg-white/95 shadow-card">
+                <h2 className="mb-3 text-sm font-bold text-ink">
                   {t('cropOtherPossibilities')}
                 </h2>
-                <div className="space-y-3">
+                <div className="space-y-3.5">
                   {result.top3.map((prediction, index) => (
-                    <Meter
-                      key={`${prediction.plant}-${prediction.disease}-${index}`}
-                      value={prediction.confidence}
-                      tone={prediction.is_healthy ? 'green' : index === 0 ? 'amber' : 'blue'}
-                      label={`${prediction.plant} — ${prediction.disease}`}
-                      valueLabel={percent(prediction.confidence)}
-                    />
+                    <div key={`${prediction.plant}-${prediction.disease}-${index}`} className="rounded-xl bg-creamSoft/60 p-3 border border-leaf/15">
+                      <Meter
+                        value={prediction.confidence}
+                        tone={prediction.is_healthy ? 'green' : index === 0 ? 'amber' : 'blue'}
+                        label={`${prediction.plant} — ${prediction.disease}`}
+                        valueLabel={percent(prediction.confidence)}
+                      />
+                    </div>
                   ))}
                 </div>
 
-                <div className="mt-5 border-t border-line pt-4">
+                <div className="mt-5 border-t border-line/60 pt-4">
                   <QualityMetrics metrics={result.metrics} t={t} />
                 </div>
               </Card>
@@ -342,11 +350,12 @@ export default function CropDoctor() {
           )}
 
           {!busy && !result && !unavailable && !error && (
-            <Card className="flex flex-col items-center justify-center p-10 text-center">
-              <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-surface text-muted">
-                <LeafIcon size={22} />
+            <Card className="flex flex-col items-center justify-center p-12 text-center rounded-2xl border border-leaf/30 bg-white/95 shadow-card">
+              <span className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-sageSoft/60 text-forest shadow-xs">
+                <LeafIcon size={26} />
               </span>
-              <p className="text-sm text-muted">{t('cropSubtitle')}</p>
+              <p className="text-sm font-semibold text-forest">Ready to inspect your crops</p>
+              <p className="mt-1 text-xs text-muted max-w-xs">{t('cropSubtitle')}</p>
             </Card>
           )}
         </div>
@@ -369,18 +378,18 @@ function RecommendationPanel({
   const healthy = !fromKindwise && prediction.is_healthy
 
   return (
-    <div>
+    <div className="rounded-2xl bg-creamSoft/70 p-4 border border-leaf/20">
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <Badge tone={healthy ? 'green' : 'amber'}>
           {healthy ? t('cropHealthy') : t('cropDiseased')}
         </Badge>
-        <Badge>{fromKindwise ? 'kindwise_api' : 'own_model'}</Badge>
+        <Badge>{fromKindwise ? 'Cloud AI' : 'Edge Model'}</Badge>
       </div>
 
-      <p className={headline ? 'text-lg font-semibold text-ink' : 'text-sm font-medium text-ink'}>
+      <p className={headline ? 'text-xl font-extrabold text-ink' : 'text-base font-bold text-ink'}>
         {prediction.plant}
       </p>
-      <p className={cx('mb-3', headline ? 'text-sm text-muted' : 'text-xs text-muted')}>
+      <p className={cx('mb-3 font-medium', headline ? 'text-sm text-forest' : 'text-xs text-forest')}>
         {prediction.disease}
       </p>
 
@@ -403,26 +412,26 @@ function QualityMetrics({
 }) {
   return (
     <div>
-      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">
+      <h3 className="mb-2.5 text-xs font-bold uppercase tracking-wider text-muted">
         {t('cropMetrics')}
       </h3>
-      <dl className="grid grid-cols-3 gap-3 text-center">
-        <div className="rounded-md border border-line bg-surface px-2 py-2">
-          <dt className="text-xs text-muted">{t('cropMetricBlur')}</dt>
-          <dd className="mt-0.5 text-sm font-semibold tabular-nums text-ink">
+      <dl className="grid grid-cols-3 gap-2.5 text-center">
+        <div className="rounded-xl border border-leaf/20 bg-creamSoft/70 px-3 py-2.5 shadow-2xs">
+          <dt className="text-[11px] font-medium text-muted">{t('cropMetricBlur')}</dt>
+          <dd className="mt-0.5 text-sm font-bold tabular-nums text-forest">
             {metrics.blur_score.toFixed(1)}
           </dd>
         </div>
-        <div className="rounded-md border border-line bg-surface px-2 py-2">
-          <dt className="text-xs text-muted">{t('cropMetricBrightness')}</dt>
-          <dd className="mt-0.5 text-sm font-semibold tabular-nums text-ink">
+        <div className="rounded-xl border border-leaf/20 bg-creamSoft/70 px-3 py-2.5 shadow-2xs">
+          <dt className="text-[11px] font-medium text-muted">{t('cropMetricBrightness')}</dt>
+          <dd className="mt-0.5 text-sm font-bold tabular-nums text-forest">
             {metrics.brightness.toFixed(0)}
           </dd>
         </div>
-        <div className="rounded-md border border-line bg-surface px-2 py-2">
-          <dt className="text-xs text-muted">{t('cropMetricGreen')}</dt>
-          <dd className="mt-0.5 text-sm font-semibold tabular-nums text-ink">
-            {(metrics.green_ratio * 100).toFixed(0)}%
+        <div className="rounded-xl border border-leaf/20 bg-creamSoft/70 px-3 py-2.5 shadow-2xs">
+          <dt className="text-[11px] font-medium text-muted">{t('cropMetricGreen')}</dt>
+          <dd className="mt-0.5 text-sm font-bold tabular-nums text-forest">
+            {percent(metrics.green_ratio * 100)}
           </dd>
         </div>
       </dl>

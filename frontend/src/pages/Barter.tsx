@@ -330,7 +330,7 @@ export default function Barter() {
                     interactive
                     className={
                       openRequest === request.id
-                        ? 'border-brand p-4 ring-1 ring-brand'
+                        ? 'border-forest p-4 ring-1 ring-forest'
                         : 'p-4'
                     }
                   >
@@ -425,7 +425,7 @@ export default function Barter() {
                             </Button>
                           )}
                           {match.status === 'confirmed' && (
-                            <p className="text-sm text-brand-text">{t('confirmedNote')}</p>
+                            <p className="text-sm text-forest">{t('confirmedNote')}</p>
                           )}
                         </div>
                       </li>

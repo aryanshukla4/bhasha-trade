@@ -83,16 +83,24 @@ export default function Schemes() {
       ) : schemes.length === 0 ? (
         <EmptyState title={t('noResults')} />
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {schemes.map((scheme) => (
-            <Card key={scheme.id} interactive className="flex flex-col p-4">
-              <span className="mb-3 flex h-9 w-9 items-center justify-center rounded-md bg-brand-soft text-brand">
-                <SchemeIcon size={18} />
+            <Card key={scheme.id} interactive className="group flex flex-col p-5 rounded-2xl border border-leaf/30 bg-white/95 shadow-card transition-all duration-200 hover:-translate-y-1 hover:shadow-lift hover:border-leaf/70">
+              <span className="mb-3.5 flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-sageSoft to-leafSoft text-forest shadow-xs ring-1 ring-leaf/30 transition-transform group-hover:scale-105">
+                <SchemeIcon size={20} />
               </span>
-              <h3 className="text-sm font-semibold text-ink">{scheme.name ?? scheme.id}</h3>
-              <p className="mt-0.5 text-xs text-muted">{scheme.id}</p>
-              <Button size="sm" className="mt-4 w-full" onClick={() => void open(scheme)}>
-                {t('schemeDetails')}
+              <h3 className="text-base font-bold text-ink group-hover:text-forest transition-colors">
+                {scheme.name ?? scheme.id}
+              </h3>
+              <p className="mt-1 text-xs text-muted font-mono">{scheme.id}</p>
+              <Button
+                size="sm"
+                variant="secondary"
+                className="mt-5 w-full rounded-xl font-semibold border-leaf/40 hover:border-forest"
+                onClick={() => void open(scheme)}
+              >
+                <span>{t('schemeDetails')}</span>
+                <span className="ml-1 transition-transform group-hover:translate-x-0.5">→</span>
               </Button>
             </Card>
           ))}

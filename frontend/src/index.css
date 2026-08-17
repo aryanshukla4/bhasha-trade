@@ -8,12 +8,16 @@
   }
 
   body {
-    @apply bg-white text-ink font-sans antialiased;
+    @apply bg-[#eaf4f7] text-ink font-sans antialiased;
+  }
+
+  ::selection {
+    @apply bg-leaf/40 text-forest;
   }
 
   /* Consistent, visible focus for keyboard users across every control. */
   :focus-visible {
-    @apply outline-none ring-2 ring-brand ring-offset-2 ring-offset-white;
+    @apply outline-none ring-2 ring-forest/50 ring-offset-2 ring-offset-cream;
   }
 
   /* Kill the number-input spinners; quantities read better without them. */
@@ -40,19 +44,377 @@
 
   /* Shared field chrome so inputs, selects and textareas can't drift apart. */
   .field-base {
-    @apply w-full rounded-md border border-line bg-white px-3 py-2 text-sm text-ink
-           placeholder:text-muted/70 transition-colors
-           focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand
-           disabled:cursor-not-allowed disabled:bg-surface disabled:text-muted;
+    @apply w-full rounded-lg border border-leaf bg-cream px-3.5 py-2.5 text-sm text-forest
+           placeholder:text-muted/70 transition-all duration-150
+           focus:border-forest focus:outline-none focus:ring-2 focus:ring-forest/20
+           disabled:cursor-not-allowed disabled:bg-creamSoft disabled:text-muted;
+  }
+
+  /* Agri glass and card surfaces */
+  .agri-glass {
+    @apply backdrop-blur-md bg-white/85 border border-leaf/25 shadow-card;
+  }
+
+  .agri-gradient-hero {
+    @apply bg-gradient-to-br from-forest via-[#0b540c] to-[#126814] text-cream;
+  }
+
+  .agri-card-hover {
+    @apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lift hover:border-leaf/60;
   }
 }
 
+/* ==========================================================================
+   Calming Agricultural Sky & Swaying Tree Animations
+   Pure CSS / SVG keyframes for natural, soothing, organic morning breeze
+   ========================================================================== */
+
+/* 1. Cloud Drifting */
+.agri-cloud-drift-1 {
+  animation: agriCloudDrift1 110s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.agri-cloud-drift-2 {
+  animation: agriCloudDrift2 140s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.agri-cloud-drift-3 {
+  animation: agriCloudDrift3 95s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes agriCloudDrift1 {
+  0% {
+    transform: translate(-30px, 0px);
+  }
+  50% {
+    transform: translate(65px, -8px);
+  }
+  100% {
+    transform: translate(-30px, 0px);
+  }
+}
+
+@keyframes agriCloudDrift2 {
+  0% {
+    transform: translate(45px, 0px);
+  }
+  50% {
+    transform: translate(-55px, 8px);
+  }
+  100% {
+    transform: translate(45px, 0px);
+  }
+}
+
+@keyframes agriCloudDrift3 {
+  0% {
+    transform: translate(0px, 0px);
+  }
+  50% {
+    transform: translate(75px, -6px);
+  }
+  100% {
+    transform: translate(0px, 0px);
+  }
+}
+
+/* 2. Whole-Tree Trunk & Main Arch Sway */
+.agri-tree-main-sway {
+  animation: agriTreeMainSway 13s ease-in-out infinite;
+  transform-box: fill-box;
+  will-change: transform;
+}
+
+@keyframes agriTreeMainSway {
+  0% {
+    transform: rotate(0deg);
+  }
+  35% {
+    transform: rotate(-0.75deg);
+  }
+  70% {
+    transform: rotate(0.65deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+/* 3. Branch Bough Sways */
+.agri-branch-sway-1 {
+  animation: agriBranchSway1 7.2s ease-in-out infinite;
+  transform-box: fill-box;
+  will-change: transform;
+}
+
+.agri-branch-sway-2 {
+  animation: agriBranchSway2 8.6s ease-in-out infinite;
+  animation-delay: -2.1s;
+  transform-box: fill-box;
+  will-change: transform;
+}
+
+.agri-branch-sway-3 {
+  animation: agriBranchSway3 6.4s ease-in-out infinite;
+  animation-delay: -3.5s;
+  transform-box: fill-box;
+  will-change: transform;
+}
+
+.agri-branch-sway-4 {
+  animation: agriBranchSway4 9.2s ease-in-out infinite;
+  animation-delay: -1.2s;
+  transform-box: fill-box;
+  will-change: transform;
+}
+
+@keyframes agriBranchSway1 {
+  0% {
+    transform: rotate(0deg);
+  }
+  42% {
+    transform: rotate(-2.4deg) translateY(-0.5px);
+  }
+  80% {
+    transform: rotate(1.5deg) translateY(0.5px);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes agriBranchSway2 {
+  0% {
+    transform: rotate(0deg);
+  }
+  36% {
+    transform: rotate(2.1deg);
+  }
+  76% {
+    transform: rotate(-1.7deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes agriBranchSway3 {
+  0% {
+    transform: rotate(0deg);
+  }
+  44% {
+    transform: rotate(-2.5deg);
+  }
+  84% {
+    transform: rotate(1.3deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes agriBranchSway4 {
+  0% {
+    transform: rotate(0deg);
+  }
+  38% {
+    transform: rotate(1.9deg);
+  }
+  80% {
+    transform: rotate(-1.6deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+/* 4. Foliage & Leaf Cluster Micro-Flutters */
+.agri-leaf-flutter-1 {
+  animation: agriLeafFlutter1 5.4s ease-in-out infinite;
+  transform-box: fill-box;
+  will-change: transform;
+}
+
+.agri-leaf-flutter-2 {
+  animation: agriLeafFlutter2 6.2s ease-in-out infinite;
+  animation-delay: -2.4s;
+  transform-box: fill-box;
+  will-change: transform;
+}
+
+.agri-leaf-flutter-3 {
+  animation: agriLeafFlutter3 4.8s ease-in-out infinite;
+  animation-delay: -1.3s;
+  transform-box: fill-box;
+  will-change: transform;
+}
+
+@keyframes agriLeafFlutter1 {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  35% {
+    transform: rotate(2.4deg) scale(1.008);
+  }
+  68% {
+    transform: rotate(-1.9deg) scale(0.995);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+@keyframes agriLeafFlutter2 {
+  0% {
+    transform: rotate(0deg);
+  }
+  32% {
+    transform: rotate(-2.6deg);
+  }
+  72% {
+    transform: rotate(2.0deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes agriLeafFlutter3 {
+  0% {
+    transform: rotate(0deg);
+  }
+  40% {
+    transform: rotate(2.1deg);
+  }
+  78% {
+    transform: rotate(-2.2deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+/* 5. Gentle Birds Flying Across Sky */
+.agri-flock-fly {
+  animation: agriFlockFly 44s linear infinite;
+  will-change: transform, opacity;
+}
+
+.agri-flock-fly-distant {
+  animation: agriFlockFlyDistant 62s linear infinite;
+  animation-delay: -22s;
+  will-change: transform, opacity;
+}
+
+.agri-bird-wing {
+  animation: agriBirdWingFlap 2.8s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+  will-change: transform;
+}
+
+.agri-bird-wing-alt {
+  animation: agriBirdWingFlap 2.8s ease-in-out infinite;
+  animation-delay: -1.1s;
+  transform-box: fill-box;
+  transform-origin: center;
+  will-change: transform;
+}
+
+@keyframes agriFlockFly {
+  0% {
+    transform: translate(-10vw, 17vh);
+    opacity: 0;
+  }
+  6% {
+    opacity: 0.85;
+  }
+  32% {
+    transform: translate(28vw, 12vh);
+  }
+  62% {
+    transform: translate(65vw, 15vh);
+  }
+  92% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate(110vw, 10vh);
+    opacity: 0;
+  }
+}
+
+@keyframes agriFlockFlyDistant {
+  0% {
+    transform: translate(-10vw, 8vh);
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.7;
+  }
+  36% {
+    transform: translate(32vw, 5vh);
+  }
+  72% {
+    transform: translate(72vw, 7vh);
+  }
+  92% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(110vw, 4vh);
+    opacity: 0;
+  }
+}
+
+@keyframes agriBirdWingFlap {
+  0%, 100% {
+    transform: scaleY(1);
+  }
+  38% {
+    transform: scaleY(1); /* gliding */
+  }
+  48% {
+    transform: scaleY(0.35) translateY(-0.5px);
+  }
+  56% {
+    transform: scaleY(-0.6) translateY(-1.5px); /* gentle flap */
+  }
+  66% {
+    transform: scaleY(0.85);
+  }
+  76% {
+    transform: scaleY(1); /* smooth glide */
+  }
+}
+
+/* Accessibility: Respect prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
-  *::after {
+  *::after,
+  .agri-cloud-drift-1,
+  .agri-cloud-drift-2,
+  .agri-cloud-drift-3,
+  .agri-tree-main-sway,
+  .agri-branch-sway-1,
+  .agri-branch-sway-2,
+  .agri-branch-sway-3,
+  .agri-branch-sway-4,
+  .agri-leaf-flutter-1,
+  .agri-leaf-flutter-2,
+  .agri-leaf-flutter-3,
+  .agri-flock-fly,
+  .agri-flock-fly-distant,
+  .agri-bird-wing,
+  .agri-bird-wing-alt {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+    animation: none !important;
     transition-duration: 0.01ms !important;
+    transform: none !important;
   }
 }

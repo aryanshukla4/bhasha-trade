@@ -175,11 +175,11 @@ export default function Orders() {
             const canReview = order.status === 'completed'
 
             return (
-              <Card key={order.id} className="p-4">
+              <Card key={order.id} className="p-5 rounded-2xl border border-leaf/30 bg-white/95 shadow-card transition-all hover:shadow-lift">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="mb-1 flex flex-wrap items-center gap-2">
-                      <h3 className="text-sm font-semibold text-ink">
+                    <div className="mb-1.5 flex flex-wrap items-center gap-2.5">
+                      <h3 className="text-base font-bold text-ink">
                         {listing?.crop_type ?? t('loading')}
                       </h3>
                       <StatusBadge
@@ -194,19 +194,19 @@ export default function Orders() {
                     {listing && (
                       <Link
                         to={`/produce/${listing.id}`}
-                        className="mt-1 inline-block text-xs text-brand-text hover:underline"
+                        className="mt-1.5 inline-block text-xs font-semibold text-forest hover:underline"
                       >
-                        {t('schemeDetails')}
+                        {t('schemeDetails')} →
                       </Link>
                     )}
                   </div>
 
-                  <div className="text-right">
-                    <p className="text-xs text-muted">{t('agreedPrice')}</p>
-                    <p className="text-lg font-semibold tabular-nums text-brand-text">
+                  <div className="rounded-xl bg-creamSoft/70 px-3.5 py-2 text-right border border-leaf/15">
+                    <p className="text-[11px] font-medium text-muted">{t('agreedPrice')}</p>
+                    <p className="text-xl font-extrabold tabular-nums text-forest">
                       {money(order.agreed_price)}
                       {listing && (
-                        <span className="ml-1 text-xs font-normal text-muted">
+                        <span className="ml-1 text-xs font-semibold text-forest/70">
                           / {listing.unit}
                         </span>
                       )}
@@ -215,15 +215,16 @@ export default function Orders() {
                 </div>
 
                 {(canAccept || canComplete || canDrop || canReview) && (
-                  <div className="mt-4 flex flex-wrap gap-2 border-t border-line pt-3">
+                  <div className="mt-4 flex flex-wrap gap-2.5 border-t border-line/60 pt-3.5">
                     {canAccept && (
                       <Button
                         size="sm"
                         variant="primary"
                         loading={busy}
                         onClick={() => void act(order, 'accept')}
+                        className="rounded-xl font-semibold"
                       >
-                        {t('actionAccept')}
+                        ✓ {t('actionAccept')}
                       </Button>
                     )}
                     {canComplete && (
@@ -232,8 +233,9 @@ export default function Orders() {
                         variant="primary"
                         loading={busy}
                         onClick={() => void act(order, 'complete')}
+                        className="rounded-xl font-semibold"
                       >
-                        {t('actionComplete')}
+                        ✓ {t('actionComplete')}
                       </Button>
                     )}
                     {canDrop && (
@@ -244,6 +246,7 @@ export default function Orders() {
                         onClick={() =>
                           void act(order, isFarmerSide ? 'reject' : 'cancel')
                         }
+                        className="rounded-xl font-semibold"
                       >
                         {isFarmerSide ? t('actionReject') : t('actionCancel')}
                       </Button>

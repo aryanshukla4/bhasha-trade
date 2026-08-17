@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { Layout } from './components/Layout'
+import { SkyBackground } from './components/SkyBackground'
 import { LoadingBlock } from './components/ui'
 import { useAuth } from './lib/auth'
 import { useI18n, useT } from './lib/i18n'
@@ -37,40 +38,37 @@ export default function App() {
     window.scrollTo(0, 0)
   }, [location.pathname])
 
-  if (booting) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <LoadingBlock label={t('loading')} />
-      </div>
-    )
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="*" element={<Navigate to="/login" replace />} />
-      </Routes>
-    )
-  }
-
   return (
-    <Routes>
-      <Route element={<Layout />}>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/market" element={<Market />} />
-        <Route path="/produce" element={<Produce />} />
-        <Route path="/produce/:id" element={<ProduceDetail />} />
-        <Route path="/orders" element={<Orders />} />
-        <Route path="/barter" element={<Barter />} />
-        <Route path="/chat" element={<Chat />} />
-        <Route path="/crop" element={<CropDoctor />} />
-        <Route path="/schemes" element={<Schemes />} />
-        <Route path="/notifications" element={<Notifications />} />
-        <Route path="/profile" element={<Profile />} />
-      </Route>
-      <Route path="/login" element={<Navigate to="/" replace />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <>
+      <SkyBackground />
+      {booting ? (
+        <div className="flex min-h-screen items-center justify-center">
+          <LoadingBlock label={t('loading')} />
+        </div>
+      ) : !isAuthenticated ? (
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      ) : (
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/market" element={<Market />} />
+            <Route path="/produce" element={<Produce />} />
+            <Route path="/produce/:id" element={<ProduceDetail />} />
+            <Route path="/orders" element={<Orders />} />
+            <Route path="/barter" element={<Barter />} />
+            <Route path="/chat" element={<Chat />} />
+            <Route path="/crop" element={<CropDoctor />} />
+            <Route path="/schemes" element={<Schemes />} />
+            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/profile" element={<Profile />} />
+          </Route>
+          <Route path="/login" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      )}
+    </>
   )
 }
