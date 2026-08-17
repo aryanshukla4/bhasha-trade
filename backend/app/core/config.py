@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     kindwise_api_key: str | None = None
     crop_model_root: str = "./crop_model"
     crop_confidence_threshold: float = 0.55
+    voice_command_model: str = "openai/gpt-oss-20b"
 
     @property
     def cors_origin_list(self) -> list[str]:

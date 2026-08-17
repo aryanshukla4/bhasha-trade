@@ -6,6 +6,7 @@ import { useT } from '../lib/i18n'
 import { readState } from '../lib/readState'
 import type { TranslationKey } from '../lib/locales/en'
 import { LanguageSelect } from './LanguageSelect'
+import VoiceCommandBar from './VoiceCommandBar'
 import {
   BarterIcon,
   BellIcon,
@@ -220,6 +221,9 @@ export function Layout() {
           <span>{t('appTagline')}</span>
         </div>
       </footer>
+
+      {/* Floating voice command mic — always accessible */}
+      <VoiceCommandBar />
 
       {/* Mobile bottom bar — thumb-reachable for the five most-used sections. */}
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white lg:hidden">

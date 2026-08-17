@@ -34,6 +34,7 @@ import type {
   SendOtpResult,
   User,
   VerificationStatus,
+  VoiceCommandResult,
   WeatherResult,
 } from './types'
 
@@ -377,6 +378,14 @@ export const api = {
       '/api/chat/text-to-voice',
       { method: 'POST', body: { text, language } },
     ),
+
+  // --- Voice commands ----------------------------------------------------
+
+  voiceCommand: (text: string, language?: string) =>
+    request<VoiceCommandResult>('/api/voice/command', {
+      method: 'POST',
+      body: { text, language },
+    }),
 
   // --- Crop --------------------------------------------------------------
 

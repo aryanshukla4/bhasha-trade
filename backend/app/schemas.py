@@ -107,5 +107,10 @@ class TextToVoiceRequest(BaseModel):
     language: str | None = None
 
 
+class VoiceCommandRequest(BaseModel):
+    text: str
+    language: str | None = None
+
+
 class NotificationSubscribeRequest(BaseModel):
     endpoint: str

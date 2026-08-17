@@ -279,6 +279,13 @@ const te: Translations = {
   statusConnected: 'కలిశారు',
   statusConfirmed: 'నిర్ధారించబడింది',
   statusPhoneVerified: 'ఫోన్ ధృవీకరించబడింది',
+
+  // voice commands
+  voiceStartListening: 'ఆదేశం మాట్లాడండి',
+  voiceStopListening: 'వినడం ఆపండి',
+  voiceProcessing: 'ప్రాసెస్ అవుతోంది…',
+  voiceCommandError: 'ఆదేశం అర్థం కాలేదు.',
+  voiceMicUnsupported: 'ఈ బ్రౌజర్‌లో వాయిస్ కమాండ్లు మద్దతు ఇవ్వవు.',
 }
 
 export default te

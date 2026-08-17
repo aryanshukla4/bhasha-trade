@@ -18,10 +18,12 @@ from app.schemas import (
     ProduceUpdateRequest,
     ReviewCreateRequest,
     TextToVoiceRequest,
+    VoiceCommandRequest,
     VoiceToTextRequest,
 )
 from app.services import crop_detection
 from app.services.domain_service import DomainService, dto, ident, own
+from app.services.voice_command import parse_with_llm
 
 router = APIRouter(tags=['business'])
 service = DomainService()
@@ -219,6 +221,12 @@ def voice(body: VoiceToTextRequest, u=Depends(user)):
 @router.post('/api/chat/text-to-voice')
 def tts(body: TextToVoiceRequest, u=Depends(user)):
     return data({'text': body.text, 'language': body.language or u.preferred_language, 'audioUrl': None})
+
+
+@router.post('/api/voice/command')
+def voice_command(body: VoiceCommandRequest, u=Depends(user)):
+    result = parse_with_llm(body.text, body.language)
+    return data(result)
 
 
 @router.post('/api/crop/detect-disease')

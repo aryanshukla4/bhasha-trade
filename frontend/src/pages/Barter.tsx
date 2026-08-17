@@ -27,6 +27,7 @@ import type {
   BarterRequest,
   Dealer,
 } from '../lib/types'
+import { getVoicePrefill } from '../lib/voiceCommands'
 import { statusLabel } from './Produce'
 
 type Tab = 'new' | 'history' | 'dealers'
@@ -34,6 +35,22 @@ type Tab = 'new' | 'history' | 'dealers'
 /** The backend parser only recognises these; keep the selects aligned to it. */
 const WANTED_OPTIONS = ['fertilizer', 'seeds', 'pesticide']
 const OFFERED_OPTIONS = ['wheat', 'rice']
+
+/** Map any Hindi/English variant to the exact Select option value. */
+function normalizeBarterItem(value: string, side: 'wanted' | 'offered'): string {
+  const v = value.toLowerCase().trim()
+  if (side === 'wanted') {
+    if (/fertiliz|खाद|khad|फर्टिलाइजर|खाने|khane/.test(v)) return 'fertilizer'
+    if (/seed|बीज|beej/.test(v)) return 'seeds'
+    if (/pesticid|कीटनाशक|keetnashak/.test(v)) return 'pesticide'
+  } else {
+    if (/wheat|गेहूं|गेहू|gehu|gehun/.test(v)) return 'wheat'
+    if (/rice|चावल|chawal|धान|dhan/.test(v)) return 'rice'
+  }
+  // If already a valid option, return as-is
+  const options = side === 'wanted' ? WANTED_OPTIONS : OFFERED_OPTIONS
+  return options.includes(v) ? v : value
+}
 
 export default function Barter() {
   const t = useT()
@@ -103,6 +120,28 @@ export default function Barter() {
     if (tab === 'dealers' && dealers.length === 0) void loadDealers()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab])
+
+  // Voice command prefill — auto-fill barter form from voice
+  useEffect(() => {
+    const prefill = getVoicePrefill()
+    if (prefill) {
+      if (prefill.text) setText(prefill.text)
+      if (prefill.itemWanted) setItemWanted(normalizeBarterItem(prefill.itemWanted, 'wanted'))
+      if (prefill.itemOffered) setItemOffered(normalizeBarterItem(prefill.itemOffered, 'offered'))
+      if (prefill.qtyWanted) setQtyWanted(prefill.qtyWanted)
+      if (prefill.qtyOffered) setQtyOffered(prefill.qtyOffered)
+      // If we have all barter fields, auto-set parsed state
+      if (prefill.itemWanted && prefill.itemOffered) {
+        setParsed({
+          intent: 'barter',
+          itemWanted: normalizeBarterItem(prefill.itemWanted, 'wanted'),
+          itemOffered: normalizeBarterItem(prefill.itemOffered, 'offered'),
+          needsClarification: false,
+        })
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   async function handleParse(event: FormEvent) {
     event.preventDefault()

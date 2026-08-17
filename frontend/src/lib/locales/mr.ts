@@ -279,6 +279,13 @@ const mr: Translations = {
   statusConnected: 'जोडलेले',
   statusConfirmed: 'निश्चित',
   statusPhoneVerified: 'फोन पडताळला',
+
+  // voice commands
+  voiceStartListening: 'आदेश बोला',
+  voiceStopListening: 'ऐकणे थांबवा',
+  voiceProcessing: 'प्रक्रिया होत आहे…',
+  voiceCommandError: 'आदेश समजला नाही.',
+  voiceMicUnsupported: 'या ब्राउझरमध्ये व्हॉइस कमांड समर्थित नाही.',
 }
 
 export default mr

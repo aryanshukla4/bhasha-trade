@@ -22,6 +22,7 @@ import {
   transcriptOf,
   type SpeechRecognitionLike,
 } from '../lib/speech'
+import { getVoicePrefill } from '../lib/voiceCommands'
 
 interface Message {
   id: string
@@ -98,6 +99,18 @@ export default function Chat() {
       cancelled = true
       stopSpeaking()
     }
+  }, [])
+
+  // Auto-send voice command prefilled questions
+  useEffect(() => {
+    const prefill = getVoicePrefill()
+    if (prefill?.question) {
+      setInput(prefill.question)
+      // Auto-send after a brief delay so the UI has rendered
+      const timer = setTimeout(() => void send(prefill.question!), 400)
+      return () => clearTimeout(timer)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {

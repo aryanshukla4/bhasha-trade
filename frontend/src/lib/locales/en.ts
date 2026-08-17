@@ -291,6 +291,13 @@ const en = {
   statusConnected: 'Connected',
   statusConfirmed: 'Confirmed',
   statusPhoneVerified: 'Phone verified',
+
+  // voice commands
+  voiceStartListening: 'Speak a command',
+  voiceStopListening: 'Stop listening',
+  voiceProcessing: 'Processing…',
+  voiceCommandError: 'Could not understand that command.',
+  voiceMicUnsupported: 'Voice commands are not supported in this browser.',
 }
 
 export type Translations = typeof en

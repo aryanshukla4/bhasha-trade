@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { EditIcon, PlusIcon, SearchIcon, TrashIcon } from '../components/icons'
 import {
   Button,
@@ -23,6 +23,40 @@ import { useAuth } from '../lib/auth'
 import { byNewest, money, number, shortDate } from '../lib/format'
 import { useT } from '../lib/i18n'
 import type { ProduceListing } from '../lib/types'
+import { getVoicePrefill } from '../lib/voiceCommands'
+
+/** Map Hindi crop names to English for the form. */
+function normalizeCropName(value: string): string {
+  const map: Record<string, string> = {
+    'गेहूं': 'Wheat', 'गेहू': 'Wheat', 'gehu': 'Wheat', 'gehun': 'Wheat',
+    'चावल': 'Rice', 'chawal': 'Rice', 'धान': 'Rice', 'dhan': 'Rice',
+    'प्याज': 'Onion', 'pyaz': 'Onion', 'कांदा': 'Onion',
+    'टमाटर': 'Tomato', 'tamatar': 'Tomato', 'टोमॅटो': 'Tomato',
+    'आलू': 'Potato', 'aloo': 'Potato', 'बटाटा': 'Potato',
+    'कपास': 'Cotton', 'kapaas': 'Cotton',
+    'गन्ना': 'Sugarcane', 'ganna': 'Sugarcane', 'ऊस': 'Sugarcane',
+    'सोयाबीन': 'Soybean', 'soybean': 'Soybean',
+    'मक्का': 'Maize', 'makka': 'Maize', 'corn': 'Maize',
+    'मिर्च': 'Chilli', 'mirchi': 'Chilli',
+    'लहसुन': 'Garlic', 'lahsun': 'Garlic',
+    'अदरक': 'Ginger', 'adrak': 'Ginger',
+    'हल्दी': 'Turmeric', 'haldi': 'Turmeric',
+    'केला': 'Banana', 'banana': 'Banana',
+    'आम': 'Mango', 'mango': 'Mango',
+    'अंगूर': 'Grapes', 'grapes': 'Grapes',
+    'अनार': 'Pomegranate', 'pomegranate': 'Pomegranate',
+    'मूंगफली': 'Groundnut', 'groundnut': 'Groundnut',
+    'चना': 'Chana', 'chana': 'Chana',
+    'दाल': 'Dal', 'dal': 'Dal',
+    'मूंग': 'Moong', 'moong': 'Moong',
+    'उड़द': 'Urad', 'urad': 'Urad',
+    'अरहर': 'Arhar', 'arhar': 'Arhar',
+    'सरसों': 'Mustard', 'mustard': 'Mustard',
+    'सूरजमुखी': 'Sunflower', 'sunflower': 'Sunflower',
+  }
+  const lower = value.toLowerCase().trim()
+  return map[lower] || map[value.trim()] || value
+}
 
 const UNITS = ['kg', 'quintal', 'tonne', 'bag', 'crate', 'dozen']
 
@@ -54,6 +88,7 @@ export default function Produce() {
   const t = useT()
   const toast = useToast()
   const { user, isFarmer } = useAuth()
+  const [searchParams] = useSearchParams()
 
   const [tab, setTab] = useState<Tab>('browse')
   const [listings, setListings] = useState<ProduceListing[]>([])
@@ -86,9 +121,39 @@ export default function Produce() {
   }
 
   useEffect(() => {
-    void load()
+    // Check for voice command prefill — opens the create form with fields filled
+    const prefill = getVoicePrefill()
+    if (prefill) {
+      setForm((prev) => ({
+        ...prev,
+        cropType: prefill.cropType ? normalizeCropName(prefill.cropType) : prev.cropType,
+        quantity: prefill.quantity ?? prev.quantity,
+        unit: prefill.unit ?? prev.unit,
+        pricePerUnit: prefill.pricePerUnit ?? prev.pricePerUnit,
+        state: prefill.state ?? prev.state,
+        district: prefill.district ?? prev.district,
+        description: prefill.description ?? prev.description,
+      }))
+      setFormOpen(true)
+    }
+
+    // Check URL params for filtering (e.g. from voice command)
+    const urlCrop = searchParams.get('cropType')
+    const urlState = searchParams.get('state')
+    if (urlCrop || urlState) {
+      if (urlCrop) setCropFilter(urlCrop)
+      if (urlState) setStateFilter(urlState)
+      const filters: { cropType?: string; state?: string } = {}
+      if (urlCrop) filters.cropType = urlCrop
+      if (urlState) filters.state = urlState
+      void load(filters)
+    } else {
+      setCropFilter('')
+      setStateFilter('')
+      void load()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [searchParams])
 
   function handleSearch(event: FormEvent) {
     event.preventDefault()

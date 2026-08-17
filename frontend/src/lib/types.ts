@@ -258,3 +258,14 @@ export function isKindwiseError(
 ): r is KindwiseError {
   return !!r && 'error' in r
 }
+
+// --- Voice commands -------------------------------------------------------
+
+export interface VoiceCommandResult {
+  intent: string
+  entities: Record<string, string>
+  route: string
+  routeParams: Record<string, string>
+  response: string
+  prefill: Record<string, string>
+}

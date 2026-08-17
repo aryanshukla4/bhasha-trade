@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { LocationIcon, SearchIcon } from '../components/icons'
 import {
   Button,
@@ -20,13 +21,14 @@ import type { MarketPrice } from '../lib/types'
 
 export default function Market() {
   const t = useT()
+  const [searchParams] = useSearchParams()
 
   const [prices, setPrices] = useState<MarketPrice[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  const [commodity, setCommodity] = useState('')
-  const [state, setState] = useState('')
+  const [commodity, setCommodity] = useState(() => searchParams.get('commodity') ?? '')
+  const [state, setState] = useState(() => searchParams.get('state') ?? '')
   const [district, setDistrict] = useState('')
 
   const [nearby, setNearby] = useState<MarketPrice[] | null>(null)
@@ -49,9 +51,22 @@ export default function Market() {
   }
 
   useEffect(() => {
-    void load()
+    const initialCommodity = searchParams.get('commodity')
+    const initialState = searchParams.get('state')
+    const filters: { commodity?: string; state?: string } = {}
+    if (initialCommodity) filters.commodity = initialCommodity
+    if (initialState) filters.state = initialState
+    if (Object.keys(filters).length > 0) {
+      if (initialCommodity) setCommodity(initialCommodity)
+      if (initialState) setState(initialState)
+      void load(filters)
+    } else {
+      setCommodity('')
+      setState('')
+      void load()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [searchParams])
 
   function handleSearch(event: FormEvent) {
     event.preventDefault()

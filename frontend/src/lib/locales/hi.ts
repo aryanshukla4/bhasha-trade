@@ -278,6 +278,13 @@ const hi: Translations = {
   statusConnected: 'जुड़ा',
   statusConfirmed: 'पक्का',
   statusPhoneVerified: 'फ़ोन सत्यापित',
+
+  // voice commands
+  voiceStartListening: 'कमांड बोलें',
+  voiceStopListening: 'सुनना बंद करें',
+  voiceProcessing: 'प्रसंस्करण…',
+  voiceCommandError: 'कमांड समझ नहीं आई।',
+  voiceMicUnsupported: 'इस ब्राउज़र में वॉइस कमांड समर्थित नहीं है।',
 }
 
 export default hi

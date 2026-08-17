@@ -74,9 +74,9 @@ class DomainService:
     def parse_barter(self,text):
         t=text.lower()
         wanted=None
-        if any(w in t for w in ('fertilizer','fertiliser','khad','खाद')):wanted='fertilizer'
-        elif any(w in t for w in ('seed','seeds','beej','बीज')):wanted='seeds'
-        elif any(w in t for w in ('pesticide','keetnashak','कीटनाशक')):wanted='pesticide'
+        if any(w in t for w in ('fertilizer','fertiliser','khad','खाद','खादे','khade','khane')):wanted='fertilizer'
+        elif any(w in t for w in ('seed','seeds','beej','बीज','biij')):wanted='seeds'
+        elif any(w in t for w in ('pesticide','keetnashak','कीटनाशक','keet','कीट')):wanted='pesticide'
 
         offered=None
         if any(w in t for w in ('wheat','gehu','gehun','गेहूं','गेहू')):offered='wheat'

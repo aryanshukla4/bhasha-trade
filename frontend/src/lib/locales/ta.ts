@@ -279,6 +279,13 @@ const ta: Translations = {
   statusConnected: 'இணைக்கப்பட்டது',
   statusConfirmed: 'உறுதியானது',
   statusPhoneVerified: 'கைபேசி சரிபார்க்கப்பட்டது',
+
+  // voice commands
+  voiceStartListening: 'ஒரு கட்டளையை பேசுங்கள்',
+  voiceStopListening: 'கேட்டலை நிறுத்து',
+  voiceProcessing: 'செயலாக்கம்…',
+  voiceCommandError: 'கட்டளையை புரிந்துகொள்ள முடியவில்லை.',
+  voiceMicUnsupported: 'இந்த உலாவியில் குரல் கட்டளைகள் ஆதரிக்கப்படவில்லை.',
 }
 
 export default ta
