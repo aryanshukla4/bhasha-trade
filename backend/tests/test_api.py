@@ -313,10 +313,10 @@ class BhashaTradeApiTests(unittest.TestCase):
         farmer = self.login("+919000000050", "farmer", "Farmer Kalu")
         headers = {"Authorization": f"Bearer {farmer['accessToken']}"}
 
-        # No trained model/opencv configured in the test environment -> the endpoint
-        # must degrade gracefully (503) instead of crashing the request.
+        # Garbage bytes must fail gracefully (422 unreadable image, or 503 if
+        # opencv/tensorflow aren't installed on this machine) - never a 500.
         response = self.client.post("/api/crop/detect-disease", headers=headers, files={"photo": ("leaf.jpg", b"not-a-real-image", "image/jpeg")})
-        self.assertEqual(response.status_code, 503)
+        self.assertIn(response.status_code, (422, 503))
 
         response = self.client.get("/api/crop/advisory/wheat", headers=headers)
         self.assertEqual(response.status_code, 200)
